@@ -20,7 +20,7 @@ namespace P2PCommunicationLibrary.Messages
                 MemoryStream input = new MemoryStream(encoding, 0, encoding.Length, false);
                 BinaryReader binaryReader = new BinaryReader(new BufferedStream(input));
 
-                binaryReader.ReadByte();                   
+                ReadByte(binaryReader);                   
             }
             catch (Exception)
             {                

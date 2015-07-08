@@ -16,6 +16,8 @@
                     return new TextMessage(encoding);
                 case MessageType.PeerAddress:
                     return new PeerAddressMessage(encoding);
+                case MessageType.ClientPeerAddress:
+                    return new PeerAddressMessage(encoding);
                 default:
                     return null;
             }

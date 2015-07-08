@@ -29,10 +29,10 @@ namespace P2PCommunicationLibrary.Messages
                 MemoryStream input = new MemoryStream(encoding, 0, encoding.Length, false);
                 BinaryReader binaryReader = new BinaryReader(new BufferedStream(input));
 
-                binaryReader.ReadByte();                   
+                ReadByte(binaryReader);
 
-                IPEndPoint localEndPoint = ParseIPEndPoint(binaryReader.ReadString());
-                IPEndPoint publicEndPoint = ParseIPEndPoint(binaryReader.ReadString());
+                IPEndPoint localEndPoint = ParseIPEndPoint(ReadString(binaryReader));
+                IPEndPoint publicEndPoint = ParseIPEndPoint(ReadString(binaryReader));
 
                 PeerAddress = new PeerAddress(localEndPoint, publicEndPoint);
             }

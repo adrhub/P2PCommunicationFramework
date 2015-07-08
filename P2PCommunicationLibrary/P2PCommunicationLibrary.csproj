@@ -56,6 +56,7 @@
     <Compile Include="Messages\MessageManager.cs" />
     <Compile Include="Messages\MessageTypeEnum.cs" />
     <Compile Include="Nodes\ClientPeer\ClientPeer.cs" />
+    <Compile Include="Nodes\ClientPeer\Connection\ServerConnection.cs" />
     <Compile Include="Nodes\Client\ClientTCP.cs" />
     <Compile Include="Nodes\Client\IClient.cs" />
     <Compile Include="Nodes\Client\MessageReceivedDelegate.cs" />
@@ -64,7 +65,7 @@
     <Compile Include="Nodes\Server\IServer.cs" />
     <Compile Include="Nodes\Server\ServerTCP.cs" />
     <Compile Include="Nodes\SuperPeer\ClientRepository.cs" />
-    <Compile Include="Nodes\SuperPeer\Connection\ClientServerConnection.cs" />
+    <Compile Include="Nodes\SuperPeer\Connection\ClientConnection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Nodes\SuperPeer\SuperPeer.cs" />
   </ItemGroup>

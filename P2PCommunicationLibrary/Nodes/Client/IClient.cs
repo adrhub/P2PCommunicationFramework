@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Net.Sockets;
 using P2PCommunicationLibrary.Messages;
 
 namespace P2PCommunicationLibrary
@@ -9,11 +10,14 @@ namespace P2PCommunicationLibrary
 
         IPEndPoint LocalEndPoint { get; }
         IPEndPoint RemoteEndPoint { get; }
-        bool IsListening { get; }
+        
 
         void Send(BinaryMessageBase message);
         BinaryMessageBase Read();
-        void Listen();        
+
+        Socket ClientSocket { get; }
+        void Listen();
+        bool IsListening { get; }
         void StopListening();
         void Close();
     }

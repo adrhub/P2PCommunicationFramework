@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using P2PCommunicationLibrary.Messages;
 
@@ -54,7 +55,7 @@ namespace P2PCommunicationLibrary.SuperPeer
                 _server.NewClientEvent += ClientConnected_EventHandler;
                 _server.Listen();
             }            
-            catch (Exception)
+            catch (SocketException se)
             {
                 StopRunning();
                 throw;
@@ -77,8 +78,8 @@ namespace P2PCommunicationLibrary.SuperPeer
         {
             Task.Factory.StartNew(() =>
             {
-                var newClientConnection = new ClientServerConnection(client);
-                newClientConnection.ProcessClient();                
+                var newClientConnection = new ClientConnection(client);
+                newClientConnection.ProcessClientConnection();                
             });
         }                
     }

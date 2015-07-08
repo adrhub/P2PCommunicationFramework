@@ -11,26 +11,27 @@ namespace P2PCommunicationLibrary
         public event MessageReceivedEventHandler MessageReceivedEvent;
 
         #region Private members
-        private MessageManager _messageManager;
-        private Socket _clientSocket;
+        private MessageManager _messageManager;       
 
         private object _syncRoot = new object();
         #endregion
 
-        #region Public members
+        #region Properties
         public bool IsListening { get; private set; }
 
         public IPEndPoint LocalEndPoint { get; private set; }
         public IPEndPoint RemoteEndPoint { get; private set; }
+        public Socket ClientSocket { get; private set; }
         #endregion
 
         public ClientTCP(Socket clientSocket, MessageManager messageManager)
         {
-            _clientSocket = clientSocket;
+            ClientSocket = clientSocket;
             _messageManager = messageManager;
 
-            LocalEndPoint = (IPEndPoint)_clientSocket.LocalEndPoint;
-            RemoteEndPoint = (IPEndPoint)_clientSocket.RemoteEndPoint;           
+            LocalEndPoint = (IPEndPoint)ClientSocket.LocalEndPoint;
+            RemoteEndPoint = (IPEndPoint)ClientSocket.RemoteEndPoint;
+            ClientSocket = clientSocket;
         }
 
         public void Send(BinaryMessageBase message)
@@ -39,7 +40,7 @@ namespace P2PCommunicationLibrary
 
             try
             {
-                _clientSocket.Send(buffer, 0, buffer.Length, SocketFlags.None);
+                ClientSocket.Send(buffer, 0, buffer.Length, SocketFlags.None);
             }
             catch (SocketException)
             {
@@ -58,7 +59,7 @@ namespace P2PCommunicationLibrary
 
             try
             {
-                _clientSocket.Receive(buffer, 0, buffer.Length, SocketFlags.None);
+                ClientSocket.Receive(buffer, 0, buffer.Length, SocketFlags.None);
                 receivedMessage = _messageManager.Decode(buffer);
             }
             catch (SocketException)
@@ -107,7 +108,7 @@ namespace P2PCommunicationLibrary
                 try
                 {
                     IsListening = false;
-                    _clientSocket.Close();
+                    ClientSocket.Close();
                 }
                 catch (SocketException se)
                 {
