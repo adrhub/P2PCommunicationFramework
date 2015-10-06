@@ -1,14 +1,15 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
 using P2PCommunicationLibrary.Messages;
 
-namespace P2PCommunicationLibrary.ClientPeer
+namespace P2PCommunicationLibrary.Peers
 {
-    public class ClientPeer
+    public class ServerPeer 
     {
+        //public List<IClient> Clients = new List<IClient>();
+
         private IClient _superPeerClient;
         private IPEndPoint _superPeerEndPoint;
         private IEncrtyptor _encrtyptor;
@@ -25,9 +26,9 @@ namespace P2PCommunicationLibrary.ClientPeer
                     _encrtyptor = value;
                 }
             }
-        }
+        }    
         
-        public ClientPeer(IPEndPoint superPeerEndPoint)
+        public ServerPeer(IPEndPoint superPeerEndPoint)
         {
             if (Encrtyptor != null)
                 _messageManager = new MessageManager(Encrtyptor);
@@ -74,7 +75,7 @@ namespace P2PCommunicationLibrary.ClientPeer
 //                IsRunning = false;
 //                _superPeerClient.Close();
 //            }
-        }
+        }    
 
         public PeerAddress GetPeerAddress()
         {           
@@ -82,7 +83,7 @@ namespace P2PCommunicationLibrary.ClientPeer
             _superPeerClient.Send(requestMessage);
 
             PeerAddress peerAddress = ((PeerAddressMessage)_superPeerClient.Read()).PeerAddress;
-            peerAddress.LocalEndPoint = new IPEndPoint(LocalIPAddress(), _superPeerClient.LocalEndPoint.Port);
+            peerAddress.PrivateEndPoint = new IPEndPoint(LocalIPAddress(), _superPeerClient.LocalEndPoint.Port);
 
             return peerAddress;
         }
@@ -101,6 +102,12 @@ namespace P2PCommunicationLibrary.ClientPeer
                 }
             }
             return localIP;
+        }    
+
+        public void AllowConnection(PeerAddress peerAddress)
+        {
+           var connectAsServerMessage = new PeerAddressMessage(peerAddress, MessageType.ConnectAsServer);
+           _superPeerClient.Send(connectAsServerMessage);
         }
     }
 }

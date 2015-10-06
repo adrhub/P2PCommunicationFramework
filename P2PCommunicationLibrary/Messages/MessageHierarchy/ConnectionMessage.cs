@@ -3,7 +3,7 @@ using System.IO;
 
 namespace P2PCommunicationLibrary.Messages
 {
-    sealed class ConnectionMessage:BinaryMessageBase
+    sealed class ConnectionMessage : BinaryMessageBase
     {
         public override MessageType TypeOfMessage { get; protected set; }       
 

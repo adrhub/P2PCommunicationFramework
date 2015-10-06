@@ -18,6 +18,10 @@
                     return new PeerAddressMessage(encoding);
                 case MessageType.ClientPeerAddress:
                     return new PeerAddressMessage(encoding);
+                case MessageType.ConnectAsClient:
+                    return new PeerAddressMessage(encoding);
+                case MessageType.ConnectAsServer:
+                    return new PeerAddressMessage(encoding);
                 default:
                     return null;
             }

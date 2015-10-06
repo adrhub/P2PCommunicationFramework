@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using P2PCommunicationLibrary;
-using P2PCommunicationLibrary.ClientPeer;
+using P2PCommunicationLibrary.Peers;
 
 namespace Test
 {
@@ -29,10 +29,21 @@ namespace Test
 //            Console.WriteLine("sadas");
 //            Thread.Sleep(60000);
 
-            ClientPeer peer = new ClientPeer(new IPEndPoint(IPAddress.Parse("192.168.1.3"), 7));
-            peer.Encrtyptor = null;
-            peer.Run();
-            PeerAddress peerAddress = peer.GetPeerAddress();
+            ServerPeer server = new ServerPeer(new IPEndPoint(IPAddress.Parse("192.168.1.2"), 7));
+            server.Encrtyptor = null;
+            server.Run();
+
+            ClientPeer client = new ClientPeer(new IPEndPoint(IPAddress.Parse("192.168.1.2"), 7));
+            client.Encrtyptor = null;
+            client.Run();
+
+            server.AllowConnection(client.GetPeerAddress());
+            client.Connect(server.GetPeerAddress());
+            
+            //PeerAddress peerAddress = peer.GetPeerAddress();
+
+
+            Thread.Sleep(60000);
 
         }
     }

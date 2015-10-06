@@ -12,6 +12,8 @@
         Confirmation = 3,
         TextMessage = 101,
         PeerAddress = 102,     
-        ClientPeerAddress = 103
+        ClientPeerAddress = 103,
+        ConnectAsClient = 104,
+        ConnectAsServer = 105
     }
 }

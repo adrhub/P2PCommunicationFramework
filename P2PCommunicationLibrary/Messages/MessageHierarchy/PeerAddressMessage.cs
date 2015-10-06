@@ -9,7 +9,7 @@ namespace P2PCommunicationLibrary.Messages
     {
         public override MessageType TypeOfMessage { get; protected set; }
         public PeerAddress PeerAddress { get; set; }
-        
+
         private PeerAddressMessage()
         {
             TypeOfMessage = MessageType.PeerAddress;
@@ -29,7 +29,7 @@ namespace P2PCommunicationLibrary.Messages
                 MemoryStream input = new MemoryStream(encoding, 0, encoding.Length, false);
                 BinaryReader binaryReader = new BinaryReader(new BufferedStream(input));
 
-                ReadByte(binaryReader);
+                TypeOfMessage = (MessageType) ReadByte(binaryReader);
 
                 IPEndPoint localEndPoint = ParseIPEndPoint(ReadString(binaryReader));
                 IPEndPoint publicEndPoint = ParseIPEndPoint(ReadString(binaryReader));
@@ -37,10 +37,10 @@ namespace P2PCommunicationLibrary.Messages
                 PeerAddress = new PeerAddress(localEndPoint, publicEndPoint);
             }
             catch (Exception)
-            {                
+            {
                 throw new BinaryEncodingException("Encode");
-            }            
-        }        
+            }
+        }
 
         public override byte[] GetEncoding()
         {
@@ -51,10 +51,10 @@ namespace P2PCommunicationLibrary.Messages
 
                 WriteMessageType(binaryWriter, this);
 
-                if (PeerAddress.LocalEndPoint == null)
+                if (PeerAddress.PrivateEndPoint == null)
                     WriteString(binaryWriter, "null");
-                else 
-                    WriteString(binaryWriter, PeerAddress.LocalEndPoint.ToString());
+                else
+                    WriteString(binaryWriter, PeerAddress.PrivateEndPoint.ToString());
 
                 if (PeerAddress.PublicEndPoint == null)
                     WriteString(binaryWriter, "null");
