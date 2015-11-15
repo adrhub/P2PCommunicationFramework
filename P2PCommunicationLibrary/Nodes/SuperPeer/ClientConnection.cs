@@ -33,7 +33,7 @@ namespace P2PCommunicationLibrary.SuperPeer
 
             if (clientConnected)
             {
-                Console.WriteLine("Client " + _client.ClientSocket.RemoteEndPoint + " Connected");
+                Console.WriteLine("Client " + _client.RemoteEndPoint + " " + _client.LocalEndPoint + " Connected");
                 _client.MessageReceivedEvent += ClientOnMessageReceivedEvent;
                 
                 
@@ -76,6 +76,9 @@ namespace P2PCommunicationLibrary.SuperPeer
             }
         }
 
+        #region ProcessClientMessages
+
+        #region InitConnection
         private void InitConnectionAsServer(PeerAddress peerAddress)
         {
             List<IClient> onlineClients = new List<IClient>(ConnectionsRepository.GetClients());
@@ -83,20 +86,14 @@ namespace P2PCommunicationLibrary.SuperPeer
 
             foreach (IClient client in onlineClients)
             {
-                if (client.LocalEndPoint.ToString() == peerAddress.PublicEndPoint.ToString()
-                    && client.RemoteEndPoint.ToString() == peerAddress.PrivateEndPoint.ToString())
+                if (IsEqualPeerAddressAndIClientAddress(peerAddress, client))
                     targetClient = client;
             }
 
-            if (targetClient != null)
+            if (IsBothClientsConnected(_client, targetClient))
             {
-                ConnectionPair connectionPair = new ConnectionPair(_client, targetClient);
-
-                if (!ConnectionsRepository.GetConnections().Contains(connectionPair))                    
-                {
-                    ConnectionsRepository.AddConnection(connectionPair);
-                    ProcessConnection(connectionPair);
-                }                              
+                ConnectionPair connectionPair = CreateConnectionPair(_client, targetClient);
+                ProcessConnection(connectionPair);
             }
         }
 
@@ -107,28 +104,42 @@ namespace P2PCommunicationLibrary.SuperPeer
 
             foreach (IClient server in onlineServers)
             {
-                if (server.LocalEndPoint.ToString() == peerAddress.PublicEndPoint.ToString()
-                    && server.RemoteEndPoint.ToString() == peerAddress.PrivateEndPoint.ToString())
+                if (IsEqualPeerAddressAndIClientAddress(peerAddress, server))
                     targetServer = server;
             }
 
-            if (targetServer != null)
+            if (IsBothClientsConnected(targetServer, _client))
             {
-                ConnectionPair connectionPair = new ConnectionPair(targetServer, _client);
-
-                if (!ConnectionsRepository.GetConnections().Contains(connectionPair))
-                {
-                    ConnectionsRepository.AddConnection(connectionPair);
-                    ProcessConnection(connectionPair);
-                }
+                ConnectionPair connectionPair = CreateConnectionPair(targetServer, _client);
+                ProcessConnection(connectionPair);
             }
         }
 
-        private void ProcessConnection(ConnectionPair connectionPair)
+        private static bool IsEqualPeerAddressAndIClientAddress(PeerAddress peerAddress, IClient client)
         {
-
+            return client.LocalEndPoint.ToString() == peerAddress.PublicEndPoint.ToString()
+                   && client.RemoteEndPoint.ToString() == peerAddress.PrivateEndPoint.ToString();
         }
 
+        private bool IsBothClientsConnected(IClient server, IClient client)
+        {
+            return server != null && client != null;
+        }
+
+        private ConnectionPair CreateConnectionPair(IClient server, IClient client)
+        {           
+            ConnectionPair connectionPair =  new ConnectionPair(server, client);
+
+            if (!ConnectionsRepository.GetConnections().Contains(connectionPair))
+            {
+                ConnectionsRepository.AddConnection(connectionPair);
+                return connectionPair;
+            }            
+
+            return null;
+        }        
+        #endregion
+        
         private void SendClientPeerAddress()
         {
             PeerAddress clientPublicAddress = new PeerAddress();
@@ -136,6 +147,13 @@ namespace P2PCommunicationLibrary.SuperPeer
 
             var message = new PeerAddressMessage(clientPublicAddress, MessageType.ClientPeerAddress);
             _client.Send(message);
-        }        
+        }
+
+        #endregion
+
+        private void ProcessConnection(ConnectionPair connectionPair)
+        {
+
+        }
     }
 }

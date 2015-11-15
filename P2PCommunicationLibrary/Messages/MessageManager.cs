@@ -8,7 +8,7 @@ namespace P2PCommunicationLibrary.Messages
 {
     class MessageManager
     {
-        private IEncrtyptor _encryptor;
+        private IEncryptor _encryptor;
 
         private BinaryEncodingFactory _encodingFactory = new BinaryEncodingFactory();
         private BinaryDecodingFactory _decodingFactory = new BinaryDecodingFactory();
@@ -18,9 +18,9 @@ namespace P2PCommunicationLibrary.Messages
             _encryptor = null;
         }
 
-        public MessageManager(IEncrtyptor encrtyptor)
+        public MessageManager(IEncryptor encryptor)
         {
-            _encryptor = encrtyptor;
+            _encryptor = encryptor;
         }
 
         public BinaryMessageBase Decode(byte[] buffer)

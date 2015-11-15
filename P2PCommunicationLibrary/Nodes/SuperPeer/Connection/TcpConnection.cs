@@ -2,7 +2,7 @@
 {
     class TcpConnection
     {
-        public TcpConnection(IClient connectingClient, IClient targetClient)
+        public TcpConnection(IClient server, IClient client)
         {
             
         }

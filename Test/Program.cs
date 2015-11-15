@@ -29,13 +29,19 @@ namespace Test
 //            Console.WriteLine("sadas");
 //            Thread.Sleep(60000);
 
-            ServerPeer server = new ServerPeer(new IPEndPoint(IPAddress.Parse("192.168.1.2"), 7));
-            server.Encrtyptor = null;
+//            ServerPeer server = new ServerPeer(new IPEndPoint(IPAddress.Parse("127.1.0.0"), 7));
+//            server.Encryptor = null;
+//            server.Run();
+
+            SP server = new SP(new IPEndPoint(IPAddress.Parse("127.1.0.0"), 7));
+            server.Encryptor = null;
             server.Run();
 
-            ClientPeer client = new ClientPeer(new IPEndPoint(IPAddress.Parse("192.168.1.2"), 7));
-            client.Encrtyptor = null;
+            ClientPeer client = new ClientPeer(new IPEndPoint(IPAddress.Parse("127.1.0.0"), 7));
+            client.Encryptor = null;
             client.Run();
+
+           
 
             server.AllowConnection(client.GetPeerAddress());
             client.Connect(server.GetPeerAddress());
@@ -44,7 +50,6 @@ namespace Test
 
 
             Thread.Sleep(60000);
-
         }
     }
 }

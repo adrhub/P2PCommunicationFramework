@@ -6,37 +6,34 @@ using P2PCommunicationLibrary.Messages;
 
 namespace P2PCommunicationLibrary
 {
-    class ClientTCP : IClient
-    {
-        public event MessageReceivedEventHandler MessageReceivedEvent;
-
-        #region Private members
-        private MessageManager _messageManager;       
-
-        private object _syncRoot = new object();
-        #endregion
-
-        #region Properties
-        public bool IsListening { get; private set; }
-
-        public IPEndPoint LocalEndPoint { get; private set; }
-        public IPEndPoint RemoteEndPoint { get; private set; }
-        public Socket ClientSocket { get; private set; }
-        #endregion
-
+    class ClientTCP : ClientBase
+    {        
         public ClientTCP(Socket clientSocket, MessageManager messageManager)
+            : base(messageManager)
         {
-            ClientSocket = clientSocket;
-            _messageManager = messageManager;
-
+            ClientSocket = clientSocket;         
             LocalEndPoint = (IPEndPoint)ClientSocket.LocalEndPoint;
-            RemoteEndPoint = (IPEndPoint)ClientSocket.RemoteEndPoint;
-            ClientSocket = clientSocket;
+            RemoteEndPoint = (IPEndPoint)ClientSocket.RemoteEndPoint;           
         }
 
-        public void Send(BinaryMessageBase message)
+        public ClientTCP(IPEndPoint connectionIpEndPoint, MessageManager messageManager)
+            : base(connectionIpEndPoint, messageManager)
         {
-            byte[] buffer = _messageManager.Encode(message);            
+            ClientSocket = InitTcpSocketConnection();
+            LocalEndPoint = (IPEndPoint) ClientSocket.LocalEndPoint;
+            RemoteEndPoint = (IPEndPoint) ClientSocket.RemoteEndPoint;
+        }
+
+        private Socket InitTcpSocketConnection()
+        {
+            Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            clientSocket.Connect(ConnectionIpEndPoint);
+            return clientSocket;
+        }
+
+        public override void Send(BinaryMessageBase message)
+        {
+            byte[] buffer = MessageManager.Encode(message);            
 
             try
             {
@@ -52,7 +49,7 @@ namespace P2PCommunicationLibrary
             }
         }
 
-        public BinaryMessageBase Read()
+        public override BinaryMessageBase Read()
         {
             byte[] buffer = new byte[EncodingConstants.MAX_MESSAGE_LENGTH];
             BinaryMessageBase receivedMessage = null;
@@ -60,7 +57,7 @@ namespace P2PCommunicationLibrary
             try
             {
                 ClientSocket.Receive(buffer, 0, buffer.Length, SocketFlags.None);
-                receivedMessage = _messageManager.Decode(buffer);
+                receivedMessage = MessageManager.Decode(buffer);
             }
             catch (SocketException)
             {
@@ -72,49 +69,6 @@ namespace P2PCommunicationLibrary
             }
 
             return receivedMessage;
-        }
-
-        public void Listen()
-        {
-            lock (_syncRoot)
-            {
-                IsListening = true;
-
-                do
-                {
-                    BinaryMessageBase receivedMessage = Read();
-                    MessageReceivedEvent(this, new MessageEventArgs(receivedMessage));
-
-                } while (IsListening);
-            }            
-        }       
-                     
-        public void StopListening()
-        {
-            if (IsListening)
-            {
-                lock (_syncRoot)
-                {
-                    // set listening bit
-                    IsListening = false;                   
-                }
-            }
-        }
-
-        public void Close()
-        {
-            lock (_syncRoot)
-            {
-                try
-                {
-                    IsListening = false;
-                    ClientSocket.Close();
-                }
-                catch (SocketException se)
-                {
-                    Trace.WriteLine("SocketException: " + se.ErrorCode + " " + se.Message);
-                }
-            }
-        }        
+        }      
     }
 }

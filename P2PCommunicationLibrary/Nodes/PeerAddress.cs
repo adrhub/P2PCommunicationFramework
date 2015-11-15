@@ -43,7 +43,7 @@ namespace P2PCommunicationLibrary
 
         public PeerAddress Parse(string peerAddress)
         {
-               
+            return null;
         }
     }
 }

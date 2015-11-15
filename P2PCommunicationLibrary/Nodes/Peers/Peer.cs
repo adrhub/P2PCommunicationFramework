@@ -5,34 +5,46 @@ using P2PCommunicationLibrary.Messages;
 
 namespace P2PCommunicationLibrary.Peers
 {
-    public abstract class Peer
+    class Peer
     {
         private IClient _superPeerClient;
         private IPEndPoint _superPeerEndPoint;
-        private IEncrtyptor _encrtyptor;
+        private IEncryptor _encryptor;
         private MessageManager _messageManager;
 
+        public PeerAddress PeerAddress{ get; private set; }
         public bool IsRunning { get; private set; }
-        public IEncrtyptor Encrtyptor
+        public IEncryptor Encryptor
         {
-            get { return _encrtyptor; }
+            get { return _encryptor; }
             set
             {
                 if (!IsRunning)
                 {
-                    _encrtyptor = value;
+                    _encryptor = value;
                 }
-            }
+            }   
         }    
         
         public Peer(IPEndPoint superPeerEndPoint)
         {
-            if (Encrtyptor != null)
-                _messageManager = new MessageManager(Encrtyptor);
+            InitMessageManager();
+            _superPeerEndPoint = superPeerEndPoint;
+        }
+
+        public Peer(IPEndPoint superPeerEndPoint, IEncryptor encryptor)
+        {
+            Encryptor = encryptor;
+            InitMessageManager();
+            _superPeerEndPoint = superPeerEndPoint;
+        }
+
+        private void InitMessageManager()
+        {
+            if (Encryptor != null)
+                _messageManager = new MessageManager(Encryptor);
             else
                 _messageManager = new MessageManager();
-
-            _superPeerEndPoint = superPeerEndPoint;
         }
 
         /// <summary>
@@ -40,18 +52,11 @@ namespace P2PCommunicationLibrary.Peers
         /// </summary>
         public void Run()
         {
-            IsRunning = true;
-
-            if (Encrtyptor != null)
-                _messageManager = new MessageManager(Encrtyptor);
-            else
-                _messageManager = new MessageManager();
+            IsRunning = true;           
 
             try
-            {
-                Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                clientSocket.Connect(_superPeerEndPoint);
-                _superPeerClient = new ClientTCP(clientSocket, _messageManager);              
+            {              
+                _superPeerClient = new ClientTCP(_superPeerEndPoint, _messageManager);              
                 _superPeerClient.Send(new ConnectionMessage());
                 //Read confirmation message
                 _superPeerClient.Read();
@@ -67,11 +72,11 @@ namespace P2PCommunicationLibrary.Peers
 
         public void Close()
         {
-//            if (IsRunning)
-//            {
-//                IsRunning = false;
-//                _superPeerClient.Close();
-//            }
+            if (IsRunning)
+            {
+                IsRunning = false;
+                _superPeerClient.Close();
+            }
         }    
 
         public PeerAddress GetPeerAddress()
@@ -99,6 +104,16 @@ namespace P2PCommunicationLibrary.Peers
                 }
             }
             return localIP;
+        }
+
+        public void SendToSuperPeer(BinaryMessageBase message)
+        {
+            _superPeerClient.Send(message);
+        }
+
+        public BinaryMessageBase ReadFromSuperPeer()
+        {
+            return _superPeerClient.Read();
         }
     }
 }

@@ -55,6 +55,8 @@
     <Compile Include="Messages\MessageHierarchy\TextMessage.cs" />
     <Compile Include="Messages\MessageManager.cs" />
     <Compile Include="Messages\MessageTypeEnum.cs" />
+    <Compile Include="Nodes\Client\ClientBase.cs" />
+    <Compile Include="Nodes\Client\ClientUDP.cs" />
     <Compile Include="Nodes\Peers\ClientPeer.cs" />
     <Compile Include="Nodes\Peers\ServerPeer.cs" />
     <Compile Include="Nodes\Peers\Peer.cs" />
@@ -63,6 +65,7 @@
     <Compile Include="Nodes\Client\MessageReceivedDelegate.cs" />
     <Compile Include="Nodes\Client\SuperPeerClient\ClientTypeEnum.cs" />
     <Compile Include="Nodes\PeerAddress.cs" />
+    <Compile Include="Nodes\Peers\SP.cs" />
     <Compile Include="Nodes\Server\ClientConnectedDelegate.cs" />
     <Compile Include="Nodes\Server\IServer.cs" />
     <Compile Include="Nodes\Server\ServerTCP.cs" />

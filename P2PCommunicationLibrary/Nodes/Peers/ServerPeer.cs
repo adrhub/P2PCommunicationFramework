@@ -1,113 +1,47 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
-using System.Net;
-using System.Net.Sockets;
+﻿using System.Net;
 using P2PCommunicationLibrary.Messages;
 
 namespace P2PCommunicationLibrary.Peers
 {
-    public class ServerPeer 
-    {
-        //public List<IClient> Clients = new List<IClient>();
+    public class SP
+    {        
+        private Peer Peer { get; }            
 
-        private IClient _superPeerClient;
-        private IPEndPoint _superPeerEndPoint;
-        private IEncrtyptor _encrtyptor;
-        private MessageManager _messageManager;
-
-        public bool IsRunning { get; private set; }
-        public IEncrtyptor Encrtyptor
+        public IEncryptor Encryptor
         {
-            get { return _encrtyptor; }
-            set
-            {
-                if (!IsRunning)
-                {
-                    _encrtyptor = value;
-                }
-            }
-        }    
-        
-        public ServerPeer(IPEndPoint superPeerEndPoint)
-        {
-            if (Encrtyptor != null)
-                _messageManager = new MessageManager(Encrtyptor);
-            else
-                _messageManager = new MessageManager();
+            get { return Peer.Encryptor; }
+            set { Peer.Encryptor = value; }
+        }   
 
-            _superPeerEndPoint = superPeerEndPoint;
+        public SP(IPEndPoint superPeerEndPoint)
+        {            
+            Peer = new Peer(superPeerEndPoint);            
         }
 
-        /// <summary>
-        /// Connectiong to Super Peer
-        /// </summary>
+        public SP(IPEndPoint superPeerEndPoint, IEncryptor encryptor)
+        {
+            Peer = new Peer(superPeerEndPoint, encryptor);
+        }
+
         public void Run()
         {
-            IsRunning = true;
-
-            if (Encrtyptor != null)
-                _messageManager = new MessageManager(Encrtyptor);
-            else
-                _messageManager = new MessageManager();
-
-            try
-            {
-                Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                clientSocket.Connect(_superPeerEndPoint);
-                _superPeerClient = new ClientTCP(clientSocket, _messageManager);              
-                _superPeerClient.Send(new ConnectionMessage());
-                //Read confirmation message
-                _superPeerClient.Read();
-            }
-            catch (SocketException se)
-            {
-                Trace.WriteLine("Error connectiong to the server");
-                Trace.WriteLine("SocketException: " + se.ErrorCode + " " + se.Message);
-                Close();
-                throw;
-            }
+            Peer.Run();
         }
 
         public void Close()
         {
-//            if (IsRunning)
-//            {
-//                IsRunning = false;
-//                _superPeerClient.Close();
-//            }
-        }    
-
-        public PeerAddress GetPeerAddress()
-        {           
-            var requestMessage = new RequestMessage(MessageType.ClientPeerAddress);
-            _superPeerClient.Send(requestMessage);
-
-            PeerAddress peerAddress = ((PeerAddressMessage)_superPeerClient.Read()).PeerAddress;
-            peerAddress.PrivateEndPoint = new IPEndPoint(LocalIPAddress(), _superPeerClient.LocalEndPoint.Port);
-
-            return peerAddress;
+            Peer.Close();
         }
 
-        private static IPAddress LocalIPAddress()
+        public PeerAddress GetPeerAddress()
         {
-            IPHostEntry host;
-            IPAddress localIP = null ;
-            host = Dns.GetHostEntry(Dns.GetHostName());
-            foreach (IPAddress ip in host.AddressList)
-            {
-                if (ip.AddressFamily == AddressFamily.InterNetwork)
-                {
-                    localIP = ip;
-                    break;
-                }
-            }
-            return localIP;
-        }    
+            return Peer.GetPeerAddress();
+        }
 
         public void AllowConnection(PeerAddress peerAddress)
         {
-           var connectAsServerMessage = new PeerAddressMessage(peerAddress, MessageType.ConnectAsServer);
-           _superPeerClient.Send(connectAsServerMessage);
+            var connectAsServerMessage = new PeerAddressMessage(peerAddress, MessageType.ConnectAsServer);
+            Peer.SendToSuperPeer(connectAsServerMessage);
         }
     }
 }

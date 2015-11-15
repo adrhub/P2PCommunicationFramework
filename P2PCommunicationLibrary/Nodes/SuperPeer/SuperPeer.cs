@@ -10,7 +10,7 @@ namespace P2PCommunicationLibrary.SuperPeer
     {
         private IServer _server;
         private MessageManager _messageManager;
-        private IEncrtyptor _encrtyptor;
+        private IEncryptor _encryptor;
 
         #region Properties
         public IPAddress Address { get; private set; }        
@@ -18,14 +18,14 @@ namespace P2PCommunicationLibrary.SuperPeer
 
         public bool IsRunning { get; private set; }
 
-        public IEncrtyptor Encrtyptor
+        public IEncryptor Encryptor
         {
-            get { return _encrtyptor; }
+            get { return _encryptor; }
             set
             {
                 if (!IsRunning)
                 {
-                    _encrtyptor = value;
+                    _encryptor = value;
                 }
             }
         }
@@ -44,8 +44,8 @@ namespace P2PCommunicationLibrary.SuperPeer
         {
             IsRunning = true;
 
-            if (Encrtyptor != null)
-                _messageManager = new MessageManager(Encrtyptor);
+            if (Encryptor != null)
+                _messageManager = new MessageManager(Encryptor);
             else            
                 _messageManager = new MessageManager();            
 
