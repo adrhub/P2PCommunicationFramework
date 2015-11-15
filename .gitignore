@@ -194,3 +194,7 @@ FakesAssemblies/
 
 # Visual Studio 6 workspace options file
 *.opt
+
+#ignor project files 
+P2PCommunicationLibrary/Nodes/Peers/ClientPeer2.cs
+P2PCommunicationLibrary/Nodes/Peers/ServerPeer2.cs

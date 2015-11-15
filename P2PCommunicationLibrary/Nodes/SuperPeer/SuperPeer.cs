@@ -78,7 +78,7 @@ namespace P2PCommunicationLibrary.SuperPeer
         {
             Task.Factory.StartNew(() =>
             {
-                var newClientConnection = new ClientConnection(client);
+                var newClientConnection = new ClientConnectionManager(client);
                 newClientConnection.ProcessClientConnection();                
             });
         }                

@@ -6,36 +6,48 @@ namespace P2PCommunicationLibrary.SuperPeer
 {
     static class ClientRepository
     {
-        private static List<IClient> _clients;
-        private static object _clientsMonitor = new object();        
+        private static readonly Dictionary<IClient, ClientInfo> Clients;
+        private static readonly object ClientsMonitor = new object();        
 
         static ClientRepository()
         {
-            _clients = new List<IClient>();
+            Clients = new Dictionary<IClient, ClientInfo>();
         }
 
         #region Clients
         public static List<IClient> GetClients()
         {
-            lock (_clientsMonitor)
+            lock (ClientsMonitor)
             {
-                return new List<IClient>(_clients);
+                return new List<IClient>(Clients.Keys);
             }            
         }
 
         public static void RemoveClient(IClient client)
         {
-            lock (_clientsMonitor)
+            lock (ClientsMonitor)
             {
-                _clients.Remove(client);
+                Clients.Remove(client);
             }
         }
 
-        public static void AddClient(IClient client)
+        public static ClientInfo AddClient(IClient client)
         {
-            lock (_clientsMonitor)
+            ClientInfo clientInfo = new ClientInfo(client);
+
+            lock (ClientsMonitor)
+            {                
+                Clients.Add(client, clientInfo);
+            }
+
+            return clientInfo;
+        }
+
+        public static ClientInfo GetClientInfo(IClient client)
+        {
+            lock (ClientsMonitor)
             {
-                _clients.Add(client);
+                return Clients[client];
             }
         }
         #endregion        

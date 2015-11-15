@@ -3,7 +3,7 @@ using P2PCommunicationLibrary.Messages;
 
 namespace P2PCommunicationLibrary.Peers
 {
-    public class SP
+    public class ServerPeer
     {        
         private Peer Peer { get; }            
 
@@ -13,12 +13,12 @@ namespace P2PCommunicationLibrary.Peers
             set { Peer.Encryptor = value; }
         }   
 
-        public SP(IPEndPoint superPeerEndPoint)
+        public ServerPeer(IPEndPoint superPeerEndPoint)
         {            
             Peer = new Peer(superPeerEndPoint);            
         }
 
-        public SP(IPEndPoint superPeerEndPoint, IEncryptor encryptor)
+        public ServerPeer(IPEndPoint superPeerEndPoint, IEncryptor encryptor)
         {
             Peer = new Peer(superPeerEndPoint, encryptor);
         }
