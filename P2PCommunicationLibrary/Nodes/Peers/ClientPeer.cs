@@ -25,7 +25,7 @@ namespace P2PCommunicationLibrary.Peers
 
         public void Run()
         {
-            Peer.Run();
+            Peer.Run(ClientType.Client);
         }
 
         public void Close()
@@ -35,7 +35,7 @@ namespace P2PCommunicationLibrary.Peers
 
         public PeerAddress GetPeerAddress()
         {
-            return Peer.GetPeerAddress();
+            return Peer.PeerAddress;
         }
 
         public void Connect(PeerAddress peerAddress)

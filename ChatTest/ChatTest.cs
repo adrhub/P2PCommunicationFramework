@@ -29,7 +29,7 @@ namespace ChatTest
 //            PeerEndPoint peer = new PeerEndPoint(p1, AddresType.Private);
 
 //            Console.WriteLine();
-            SuperPeer s = new SuperPeer(IPAddress.Any, 7);
+            SuperPeer s = new SuperPeer(IPAddress.Parse("127.1.0.0"), 8090);
             s.Run();
          
 

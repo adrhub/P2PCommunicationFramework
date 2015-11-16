@@ -37,6 +37,13 @@ namespace P2PCommunicationLibrary
 
             try
             {
+//                Console.Write("\nSend: ");
+//                foreach (var b in buffer)
+//                {
+//                    Console.Write(b + " ");
+//                }                                
+
+                ClientSocket.Receive(new byte[1], 0, 1, SocketFlags.None);
                 ClientSocket.Send(buffer, 0, buffer.Length, SocketFlags.None);
             }
             catch (SocketException)
@@ -45,7 +52,7 @@ namespace P2PCommunicationLibrary
             }
             catch (BinaryEncodingException)
             {
-                Trace.WriteLine("BinaryEncodingException: Encode");
+                Console.WriteLine("BinaryEncodingException: Encode");
             }
         }
 
@@ -55,9 +62,17 @@ namespace P2PCommunicationLibrary
             BinaryMessageBase receivedMessage = null;
 
             try
-            {
+            {                
+                ClientSocket.Send(new byte[]{1}, 0, 1, SocketFlags.None);
                 ClientSocket.Receive(buffer, 0, buffer.Length, SocketFlags.None);
                 receivedMessage = MessageManager.Decode(buffer);
+
+//                Console.Write("\nRead: ");
+//                foreach (var b in buffer)
+//                {
+//                    Console.Write(b + " ");
+//                }
+//                Console.WriteLine();
             }
             catch (SocketException)
             {
@@ -65,10 +80,10 @@ namespace P2PCommunicationLibrary
             }
             catch(BinaryEncodingException)
             {
-                Trace.WriteLine("BinaryEncodingException: Decode");
+                Console.WriteLine("BinaryEncodingException: Decode");
             }
 
             return receivedMessage;
-        }      
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 using P2PCommunicationLibrary.Messages;
 
@@ -81,6 +82,12 @@ namespace P2PCommunicationLibrary.SuperPeer
                 var newClientConnection = new ClientConnectionManager(client);
                 newClientConnection.ProcessClientConnection();                
             });
+
+//            var newClientConnection = new ClientConnectionManager(client);
+//            newClientConnection.ProcessClientConnection();
+//
+//            Thread thread = new Thread(newClientConnection.ProcessClientConnection);
+//            thread.Start();
         }                
     }
 }

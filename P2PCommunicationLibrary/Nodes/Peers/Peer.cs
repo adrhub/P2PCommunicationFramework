@@ -1,6 +1,9 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using P2PCommunicationLibrary.Messages;
 
 namespace P2PCommunicationLibrary.Peers
@@ -50,14 +53,16 @@ namespace P2PCommunicationLibrary.Peers
         /// <summary>
         /// Connectiong to Super Peer
         /// </summary>
-        public void Run()
+        public void Run(ClientType clientType)
         {
             IsRunning = true;           
 
             try
             {              
-                _superPeerClient = new ClientTCP(_superPeerEndPoint, _messageManager);              
-                _superPeerClient.Send(new ConnectionMessage());
+                InitSuperPeerConnection();
+                InitPeerType(clientType);
+                PeerAddress = InitPeerAddress();
+
                 //Read confirmation message
                 _superPeerClient.Read();
             }
@@ -68,6 +73,34 @@ namespace P2PCommunicationLibrary.Peers
                 Close();
                 throw;
             }
+        }        
+
+        private void InitSuperPeerConnection()
+        {
+            _superPeerClient = new ClientTCP(_superPeerEndPoint, _messageManager);
+            _superPeerClient.Send(new ConnectionMessage());
+        }
+
+        private void InitPeerType(ClientType clientType)
+        {           
+            if (clientType == ClientType.Client)
+                _superPeerClient.Send(new RequestMessage(MessageType.InitConnectionAsClient));
+            else if (clientType == ClientType.Server)
+            {             
+                _superPeerClient.Send(new RequestMessage(MessageType.InitConnectionAsServer));                               
+            }           
+        }
+
+        private PeerAddress InitPeerAddress()
+        {                      
+            var requestMessage = new RequestMessage(MessageType.ClientPeerAddress);
+            _superPeerClient.Send(requestMessage);
+
+            PeerAddress peerAddress = ((PeerAddressMessage)_superPeerClient.Read()).PeerAddress;
+            peerAddress.PrivateEndPoint = new IPEndPoint(LocalIpAddress(), _superPeerClient.LocalEndPoint.Port);
+            _superPeerClient.Send(new PeerAddressMessage(peerAddress, MessageType.ClientPeerAddress));
+           
+            return peerAddress;
         }
 
         public void Close()
@@ -77,33 +110,12 @@ namespace P2PCommunicationLibrary.Peers
                 IsRunning = false;
                 _superPeerClient.Close();
             }
-        }    
+        }                   
 
-        public PeerAddress GetPeerAddress()
-        {           
-            var requestMessage = new RequestMessage(MessageType.ClientPeerAddress);
-            _superPeerClient.Send(requestMessage);
-
-            PeerAddress peerAddress = ((PeerAddressMessage)_superPeerClient.Read()).PeerAddress;
-            peerAddress.PrivateEndPoint = new IPEndPoint(LocalIPAddress(), _superPeerClient.LocalEndPoint.Port);
-
-            return peerAddress;
-        }
-
-        private static IPAddress LocalIPAddress()
+        private static IPAddress LocalIpAddress()
         {
-            IPHostEntry host;
-            IPAddress localIP = null ;
-            host = Dns.GetHostEntry(Dns.GetHostName());
-            foreach (IPAddress ip in host.AddressList)
-            {
-                if (ip.AddressFamily == AddressFamily.InterNetwork)
-                {
-                    localIP = ip;
-                    break;
-                }
-            }
-            return localIP;
+            var host = Dns.GetHostEntry(Dns.GetHostName());
+            return host.AddressList.FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork);
         }
 
         public void SendToSuperPeer(BinaryMessageBase message)

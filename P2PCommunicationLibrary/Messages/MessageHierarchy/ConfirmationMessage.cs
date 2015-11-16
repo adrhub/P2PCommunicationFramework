@@ -50,7 +50,7 @@ namespace P2PCommunicationLibrary.Messages
 
                 byte[] buffer = outputStream.ToArray();
 
-                if (buffer.Length <= EncodingConstants.MAX_MESSAGE_LENGTH)
+                if (buffer.Length < EncodingConstants.MAX_MESSAGE_LENGTH)
                     return outputStream.ToArray();
                 else
                     throw new BinaryEncodingException();

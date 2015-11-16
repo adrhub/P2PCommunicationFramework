@@ -43,7 +43,7 @@ namespace P2PCommunicationLibrary.Messages
             Encoding encoding = Encoding.GetEncoding(EncodingConstants.DEFAULT_CHAR_ENC);
             byte[] textBuffer = encoding.GetBytes(value);
             WriteInt(binaryWriter, textBuffer.Length);
-            binaryWriter.Write(textBuffer);
+            binaryWriter.Write(textBuffer);          
         }
 
         protected static void WriteMessageType(BinaryWriter binaryWriter, BinaryMessageBase message)
@@ -69,6 +69,16 @@ namespace P2PCommunicationLibrary.Messages
         protected static void WriteBool(BinaryWriter binaryWriter, bool value)
         {
             binaryWriter.Write(value);
-        }      
+        }
+
+        /// <summary>
+        /// writes length. deprecated
+        /// </summary>
+        /// <param name="binaryWriter"></param>
+        protected static void WriteLength(BinaryWriter binaryWriter)
+        {
+            binaryWriter.Seek(0, SeekOrigin.Begin);
+            WriteInt(binaryWriter, (int)binaryWriter.BaseStream.Length);
+        }
     }
 }

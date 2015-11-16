@@ -29,15 +29,15 @@ namespace Test
 //            Console.WriteLine("sadas");
 //            Thread.Sleep(60000);
 
-//            ServerPeer server = new ServerPeer(new IPEndPoint(IPAddress.Parse("127.1.0.0"), 7));
+//            ServerPeer2 server = new ServerPeer2(new IPEndPoint(IPAddress.Parse("127.1.0.0"), 7));
 //            server.Encryptor = null;
 //            server.Run();
 
-            SP server = new SP(new IPEndPoint(IPAddress.Parse("127.1.0.0"), 7));
+            ServerPeer server = new ServerPeer(new IPEndPoint(IPAddress.Parse("127.1.0.0"), 8090));
             server.Encryptor = null;
             server.Run();
 
-            ClientPeer client = new ClientPeer(new IPEndPoint(IPAddress.Parse("127.1.0.0"), 7));
+            ClientPeer client = new ClientPeer(new IPEndPoint(IPAddress.Parse("127.1.0.0"), 8090));
             client.Encryptor = null;
             client.Run();
 

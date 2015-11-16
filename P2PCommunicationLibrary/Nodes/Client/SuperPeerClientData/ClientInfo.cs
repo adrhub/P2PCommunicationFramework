@@ -35,13 +35,13 @@ namespace P2PCommunicationLibrary
             return this;
         }
 
-        public ClientInfo ConnectionDateTime(PeerAddress peerAddress)
+        public ClientInfo PeerAddress(PeerAddress peerAddress)
         {
             _peerAddress = peerAddress;
             return this;
         }
 
-        public ClientInfo ConnectionDateTime(ClientType clientType)
+        public ClientInfo ClientType(ClientType clientType)
         {
             _clientType = clientType;
             return this;

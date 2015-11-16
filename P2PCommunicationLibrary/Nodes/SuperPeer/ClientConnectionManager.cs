@@ -5,16 +5,35 @@ using P2PCommunicationLibrary.Messages;
 
 namespace P2PCommunicationLibrary.SuperPeer
 {
-    class ClientConnection
+    class ClientConnectionManager
     {
         private IClient _client;
 
-        public ClientConnection(IClient client)
+        public ClientConnectionManager(IClient client)
         {
             _client = client;
         }
 
         public void ProcessClientConnection()
+        {
+            var clientConnected = InitClientConnection();
+
+            if (clientConnected)
+            {
+                Console.WriteLine("Client " + _client.RemoteEndPoint + " " + _client.LocalEndPoint + " Connected");
+
+                ClientType clientType = InitPeerType();
+
+                if (clientType != ClientType.None)                                
+                    AddClientToRepositoryAndInitClientInfo(clientType);
+
+                _client.Send(new ConfirmationMessage(MessageType.Connection));
+                _client.MessageReceivedEvent += ClientOnMessageReceivedEvent;                                                                
+                _client.Listen();                
+            }
+        }        
+
+        private bool InitClientConnection()
         {
             bool clientConnected = true;
 
@@ -31,16 +50,52 @@ namespace P2PCommunicationLibrary.SuperPeer
                 clientConnected = false;
             }
 
-            if (clientConnected)
+            return clientConnected;
+        }
+
+        private ClientType InitPeerType()
+        {                      
+            var message = _client.Read();            
+
+            if (!(message is RequestMessage))
+                _client.Close();
+            else
             {
-                Console.WriteLine("Client " + _client.RemoteEndPoint + " " + _client.LocalEndPoint + " Connected");
-                _client.MessageReceivedEvent += ClientOnMessageReceivedEvent;
-                
-                
-                ClientRepository.AddClient(_client);
-                _client.Send(new ConfirmationMessage(MessageType.Connection));
-                _client.Listen();                
-            }            
+                RequestMessage requestMessage = (RequestMessage) message;
+
+                if (requestMessage.RequestedMessageType == MessageType.InitConnectionAsClient)
+                {
+                    ConnectionsRepository.AddClient(_client);
+                    return ClientType.Client;                    
+                }
+                else if (requestMessage.RequestedMessageType == MessageType.InitConnectionAsServer)
+                {
+                    ConnectionsRepository.AddServer(_client);
+                    return ClientType.Server;
+                }
+                else
+                    _client.Close();
+            }
+            
+            return ClientType.None;            
+        }
+
+        private void AddClientToRepositoryAndInitClientInfo(ClientType clientType)
+        {            
+            var requestMessage = _client.Read() as RequestMessage;
+
+            if (requestMessage != null && requestMessage.RequestedMessageType == MessageType.ClientPeerAddress)
+            {                
+                PeerAddress peerAddress = new PeerAddress {PublicEndPoint = _client.RemoteEndPoint};
+
+                _client.Send(new PeerAddressMessage(peerAddress, MessageType.ClientPeerAddress));
+                peerAddress.PrivateEndPoint = ((PeerAddressMessage)_client.Read()).PeerAddress.PrivateEndPoint;
+
+                ClientInfo info = ClientRepository.AddClient(_client);
+                info.ClientType(clientType).ConnectionDateTime(DateTime.Now).PeerAddress(peerAddress);
+            }
+            else
+                _client.Close();
         }
 
         /// <summary>
@@ -57,20 +112,15 @@ namespace P2PCommunicationLibrary.SuperPeer
             {                                
                 case MessageType.Request:
                     switch (((RequestMessage)message).RequestedMessageType)
-                    {
-                        case MessageType.ClientPeerAddress:
-                            SendClientPeerAddress();
-                            break;                        
+                    {                                        
                     }
                     break;
 
-                case MessageType.ConnectAsServer:
-                    ConnectionsRepository.AddServer(_client);
+                case MessageType.ConnectAsServer:                    
                     InitConnectionAsServer(((PeerAddressMessage)messageArgs.Message).PeerAddress);
                     break;
 
-                case MessageType.ConnectAsClient:
-                    ConnectionsRepository.AddClient(_client);
+                case MessageType.ConnectAsClient:                    
                     InitConnectionAsClient(((PeerAddressMessage)messageArgs.Message).PeerAddress);
                     break;
             }
@@ -86,14 +136,19 @@ namespace P2PCommunicationLibrary.SuperPeer
 
             foreach (IClient client in onlineClients)
             {
-                if (IsEqualPeerAddressAndIClientAddress(peerAddress, client))
+                if (ClientRepository.GetClientInfo(client).PeerAddress().Equals(peerAddress))
                     targetClient = client;
             }
 
             if (IsBothClientsConnected(_client, targetClient))
             {
                 ConnectionPair connectionPair = CreateConnectionPair(_client, targetClient);
-                ProcessConnection(connectionPair);
+
+                if (!ConnectionsRepository.GetConnections().Contains(connectionPair))
+                {
+                    ConnectionsRepository.AddConnection(connectionPair);
+                    ProcessConnection(connectionPair);
+                }                
             }
         }
 
@@ -104,22 +159,22 @@ namespace P2PCommunicationLibrary.SuperPeer
 
             foreach (IClient server in onlineServers)
             {
-                if (IsEqualPeerAddressAndIClientAddress(peerAddress, server))
+                if (ClientRepository.GetClientInfo(server).PeerAddress().Equals(peerAddress))
                     targetServer = server;
             }
 
             if (IsBothClientsConnected(targetServer, _client))
             {
                 ConnectionPair connectionPair = CreateConnectionPair(targetServer, _client);
-                ProcessConnection(connectionPair);
+
+                if (!ConnectionsRepository.GetConnections().Contains(connectionPair))
+                {
+                    ConnectionsRepository.AddConnection(connectionPair);
+                    ProcessConnection(connectionPair);
+                }
             }
         }
-
-        private static bool IsEqualPeerAddressAndIClientAddress(PeerAddress peerAddress, IClient client)
-        {
-            return client.LocalEndPoint.ToString() == peerAddress.PublicEndPoint.ToString()
-                   && client.RemoteEndPoint.ToString() == peerAddress.PrivateEndPoint.ToString();
-        }
+        
 
         private bool IsBothClientsConnected(IClient server, IClient client)
         {
@@ -138,22 +193,13 @@ namespace P2PCommunicationLibrary.SuperPeer
 
             return null;
         }        
-        #endregion
-        
-        private void SendClientPeerAddress()
-        {
-            PeerAddress clientPublicAddress = new PeerAddress();
-            clientPublicAddress.PublicEndPoint = _client.LocalEndPoint;
-
-            var message = new PeerAddressMessage(clientPublicAddress, MessageType.ClientPeerAddress);
-            _client.Send(message);
-        }
+        #endregion            
 
         #endregion
 
         private void ProcessConnection(ConnectionPair connectionPair)
         {
-
+            Console.WriteLine("Hello from process connection");
         }
     }
 }

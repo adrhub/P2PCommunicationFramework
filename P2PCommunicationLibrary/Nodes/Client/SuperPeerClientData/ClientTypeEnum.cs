@@ -2,7 +2,7 @@
 {
     enum ClientType
     {
-        None,
+        None,       
         Client,
         Server
     }

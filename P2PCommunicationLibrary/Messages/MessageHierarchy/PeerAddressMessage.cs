@@ -31,8 +31,8 @@ namespace P2PCommunicationLibrary.Messages
 
                 TypeOfMessage = (MessageType) ReadByte(binaryReader);
 
-                IPEndPoint localEndPoint = ParseIPEndPoint(ReadString(binaryReader));
-                IPEndPoint publicEndPoint = ParseIPEndPoint(ReadString(binaryReader));
+                IPEndPoint localEndPoint = ParseIpEndPoint(ReadString(binaryReader));
+                IPEndPoint publicEndPoint = ParseIpEndPoint(ReadString(binaryReader));
 
                 PeerAddress = new PeerAddress(localEndPoint, publicEndPoint);
             }
@@ -76,14 +76,18 @@ namespace P2PCommunicationLibrary.Messages
             }
         }
 
-        private static IPEndPoint ParseIPEndPoint(string endPoint)
+        private static IPEndPoint ParseIpEndPoint(string endPoint)
         {
             if (endPoint == "null")
                 return null;
 
             string[] ep = endPoint.Split(':');
-            if (ep.Length < 2) throw new FormatException("Invalid endpoint format");
+
+            if (ep.Length < 2)
+                throw new FormatException("Invalid endpoint format");
+
             IPAddress ip;
+
             if (ep.Length > 2)
             {
                 if (!IPAddress.TryParse(string.Join(":", ep, 0, ep.Length - 1), out ip))
@@ -98,11 +102,14 @@ namespace P2PCommunicationLibrary.Messages
                     throw new FormatException("Invalid ip-adress");
                 }
             }
+
             int port;
+
             if (!int.TryParse(ep[ep.Length - 1], NumberStyles.None, NumberFormatInfo.CurrentInfo, out port))
             {
                 throw new FormatException("Invalid port");
             }
+
             return new IPEndPoint(ip, port);
         }
     }
