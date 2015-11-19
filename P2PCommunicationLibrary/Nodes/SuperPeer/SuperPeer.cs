@@ -80,13 +80,13 @@ namespace P2PCommunicationLibrary.SuperPeer
             Task.Factory.StartNew(() =>
             {
                 var newClientConnection = new ClientConnectionManager(client);
-                newClientConnection.ProcessClientConnection();                
+                newClientConnection.BeginProcessClientConnection();                
             });
 
 //            var newClientConnection = new ClientConnectionManager(client);
-//            newClientConnection.ProcessClientConnection();
+//            newClientConnection.BeginProcessClientConnection();
 //
-//            Thread thread = new Thread(newClientConnection.ProcessClientConnection);
+//            Thread thread = new Thread(newClientConnection.BeginProcessClientConnection);
 //            thread.Start();
         }                
     }

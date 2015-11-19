@@ -9,19 +9,23 @@ namespace P2PCommunicationLibrary
     class ClientTCP : ClientBase
     {        
         private ICommunicator _communicator;
+
         public ClientTCP(Socket clientSocket, MessageManager messageManager)
             : base(messageManager)
         {
             ClientSocket = clientSocket;         
-            LocalEndPoint = (IPEndPoint)ClientSocket.LocalEndPoint;
-            RemoteEndPoint = (IPEndPoint)ClientSocket.RemoteEndPoint;           
-            _communicator = new TcpCommunicator(ClientSocket);
+            InitProperties();
         }
 
         public ClientTCP(IPEndPoint connectionIpEndPoint, MessageManager messageManager)
             : base(connectionIpEndPoint, messageManager)
         {
             ClientSocket = InitTcpSocketConnection();
+            InitProperties();
+        }
+
+        private void InitProperties()
+        {
             LocalEndPoint = (IPEndPoint) ClientSocket.LocalEndPoint;
             RemoteEndPoint = (IPEndPoint) ClientSocket.RemoteEndPoint;
             _communicator = new TcpCommunicator(ClientSocket);

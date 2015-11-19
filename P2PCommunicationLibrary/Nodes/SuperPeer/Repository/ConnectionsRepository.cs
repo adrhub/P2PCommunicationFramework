@@ -4,11 +4,11 @@ namespace P2PCommunicationLibrary.SuperPeer
 {
     static class ConnectionsRepository
     {
-        private static List<ConnectionPair> _connectionPairs;
-        private static List<IClient> _servers;
-        private static List<IClient> _clients;
+        private static readonly List<ConnectionPair> _connectionPairs;
+        private static readonly List<IClient> _servers;
+        private static readonly List<IClient> _clients;
 
-        private static object _peersMonitor = new object();
+        private static readonly object _peersMonitor = new object();
 
         static ConnectionsRepository()
         {

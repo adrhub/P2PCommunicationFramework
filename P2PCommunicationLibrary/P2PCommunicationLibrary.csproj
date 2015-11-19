@@ -55,6 +55,7 @@
     <Compile Include="Messages\MessageManager.cs" />
     <Compile Include="Messages\MessagesEncodingUtil.cs" />
     <Compile Include="Messages\MessageTypeEnum.cs" />
+    <Compile Include="Nodes\SuperPeer\ClientMessageManager.cs" />
     <Compile Include="Nodes\Client\ClientBase.cs" />
     <Compile Include="Nodes\Client\ClientUDP.cs" />
     <Compile Include="Nodes\Client\Communication\TcpCommunicator.cs" />

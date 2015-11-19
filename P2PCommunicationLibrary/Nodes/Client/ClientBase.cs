@@ -11,7 +11,7 @@ namespace P2PCommunicationLibrary
         public event MessageReceivedEventHandler MessageReceivedEvent;
 
         #region Private members
-        private object _syncRoot = new object();
+        private readonly object _socketMonitor = new object();
         #endregion
 
         #region Properties
@@ -44,7 +44,7 @@ namespace P2PCommunicationLibrary
 
         public void Listen()
         {
-            lock (_syncRoot)
+            lock (_socketMonitor)
             {
                 IsListening = true;
 
@@ -61,7 +61,7 @@ namespace P2PCommunicationLibrary
         {
             if (IsListening)
             {
-                lock (_syncRoot)
+                lock (_socketMonitor)
                 {
                     // set listening bit
                     IsListening = false;
@@ -71,7 +71,7 @@ namespace P2PCommunicationLibrary
 
         public void Close()
         {
-            lock (_syncRoot)
+            lock (_socketMonitor)
             {
                 try
                 {
