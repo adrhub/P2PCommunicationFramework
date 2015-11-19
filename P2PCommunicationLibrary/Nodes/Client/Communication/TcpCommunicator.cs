@@ -1,11 +1,12 @@
-﻿using System.Net.Sockets;
+﻿using System.IO;
+using System.Net.Sockets;
 using P2PCommunicationLibrary.Messages;
 
 namespace P2PCommunicationLibrary
 {
     class TcpCommunicator : ICommunicator
     {
-        private Socket _communicationSocket;
+        private readonly Socket _communicationSocket;
 
         public TcpCommunicator(Socket communicationSocket)
         {
@@ -14,12 +15,34 @@ namespace P2PCommunicationLibrary
 
         public byte[] Read()
         {
-            return null;
+            NetworkStream networkStream = new NetworkStream(_communicationSocket);
+            BinaryReader binaryReader = new BinaryReader(networkStream);
+
+            int messageLength = MessagesEncodingUtil.ReadInt(binaryReader);
+
+            byte[] readBuffer = binaryReader.ReadBytes(messageLength);
+
+            binaryReader.Close();
+            networkStream.Close();
+
+            return readBuffer;
         }
 
         public void Write(byte[] buffer)
         {
-            byte[] sendBuffer = new byte[buffer.Length + 1];            
+            MemoryStream outputStream = new MemoryStream();
+            BinaryWriter binaryWriter = new BinaryWriter(new BufferedStream(outputStream));
+
+            MessagesEncodingUtil.WriteInt(binaryWriter, buffer.Length);
+            binaryWriter.Write(buffer, 0, buffer.Length);
+
+            binaryWriter.Flush();
+            byte[] sendBuffer = outputStream.ToArray();
+
+            _communicationSocket.Send(sendBuffer, 0, sendBuffer.Length, SocketFlags.None);
+
+            binaryWriter.Close();
+            outputStream.Close();
         }
     }
 }

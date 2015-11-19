@@ -46,7 +46,6 @@
     <Compile Include="Messages\MessageFactory\BinaryEncodingFactory.cs" />
     <Compile Include="Messages\MessageFactory\IDecodingFactory.cs" />
     <Compile Include="Messages\MessageFactory\IEncodingFactory.cs" />
-    <Compile Include="Messages\MessageHierarchy\BinaryEncodableBase.cs" />
     <Compile Include="Messages\MessageHierarchy\BinaryMessageBase.cs" />
     <Compile Include="Messages\MessageHierarchy\ConfirmationMessage.cs" />
     <Compile Include="Messages\MessageHierarchy\ConnectionMessage.cs" />
@@ -54,11 +53,14 @@
     <Compile Include="Messages\MessageHierarchy\RequestMessage.cs" />
     <Compile Include="Messages\MessageHierarchy\TextMessage.cs" />
     <Compile Include="Messages\MessageManager.cs" />
+    <Compile Include="Messages\MessagesEncodingUtil.cs" />
     <Compile Include="Messages\MessageTypeEnum.cs" />
     <Compile Include="Nodes\Client\ClientBase.cs" />
     <Compile Include="Nodes\Client\ClientUDP.cs" />
+    <Compile Include="Nodes\Client\Communication\TcpCommunicator.cs" />
+    <Compile Include="Nodes\Client\Communication\ICommunicator.cs" />
     <Compile Include="Nodes\Client\SuperPeerClientData\ClientInfo.cs" />
-    <Compile Include="Nodes\Client\SuperPeerClientData\PeerAddress.cs" />
+    <Compile Include="Nodes\PeerAddress.cs" />
     <Compile Include="Nodes\Peers\ClientPeer.cs" />
     <Compile Include="Nodes\Peers\ClientPeer2.cs" />
     <Compile Include="Nodes\Peers\ServerPeer2.cs" />

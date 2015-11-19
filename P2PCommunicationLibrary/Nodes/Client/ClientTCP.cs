@@ -8,12 +8,14 @@ namespace P2PCommunicationLibrary
 {
     class ClientTCP : ClientBase
     {        
+        private ICommunicator _communicator;
         public ClientTCP(Socket clientSocket, MessageManager messageManager)
             : base(messageManager)
         {
             ClientSocket = clientSocket;         
             LocalEndPoint = (IPEndPoint)ClientSocket.LocalEndPoint;
             RemoteEndPoint = (IPEndPoint)ClientSocket.RemoteEndPoint;           
+            _communicator = new TcpCommunicator(ClientSocket);
         }
 
         public ClientTCP(IPEndPoint connectionIpEndPoint, MessageManager messageManager)
@@ -22,6 +24,7 @@ namespace P2PCommunicationLibrary
             ClientSocket = InitTcpSocketConnection();
             LocalEndPoint = (IPEndPoint) ClientSocket.LocalEndPoint;
             RemoteEndPoint = (IPEndPoint) ClientSocket.RemoteEndPoint;
+            _communicator = new TcpCommunicator(ClientSocket);
         }
 
         private Socket InitTcpSocketConnection()
@@ -33,18 +36,10 @@ namespace P2PCommunicationLibrary
 
         public override void Send(BinaryMessageBase message)
         {
-            byte[] buffer = MessageManager.Encode(message);            
-
             try
             {
-//                Console.Write("\nSend: ");
-//                foreach (var b in buffer)
-//                {
-//                    Console.Write(b + " ");
-//                }                                
-
-                ClientSocket.Receive(new byte[1], 0, 1, SocketFlags.None);
-                ClientSocket.Send(buffer, 0, buffer.Length, SocketFlags.None);
+                var buffer = MessageManager.Encode(message);
+                _communicator.Write(buffer);
             }
             catch (SocketException)
             {
@@ -62,17 +57,9 @@ namespace P2PCommunicationLibrary
             BinaryMessageBase receivedMessage = null;
 
             try
-            {                
-                ClientSocket.Send(new byte[]{1}, 0, 1, SocketFlags.None);
-                ClientSocket.Receive(buffer, 0, buffer.Length, SocketFlags.None);
+            {
+                buffer = _communicator.Read();
                 receivedMessage = MessageManager.Decode(buffer);
-
-//                Console.Write("\nRead: ");
-//                foreach (var b in buffer)
-//                {
-//                    Console.Write(b + " ");
-//                }
-//                Console.WriteLine();
             }
             catch (SocketException)
             {
@@ -81,7 +68,7 @@ namespace P2PCommunicationLibrary
             catch(BinaryEncodingException)
             {
                 Console.WriteLine("BinaryEncodingException: Decode");
-            }
+            }         
 
             return receivedMessage;
         }

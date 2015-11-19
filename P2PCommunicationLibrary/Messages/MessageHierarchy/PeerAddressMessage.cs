@@ -26,13 +26,13 @@ namespace P2PCommunicationLibrary.Messages
         {
             try
             {
-                MemoryStream input = new MemoryStream(encoding, 0, encoding.Length, false);
-                BinaryReader binaryReader = new BinaryReader(new BufferedStream(input));
+                MemoryStream memoryStream = new MemoryStream(encoding, 0, encoding.Length, false);
+                BinaryReader binaryReader = new BinaryReader(new BufferedStream(memoryStream));
 
-                TypeOfMessage = (MessageType) ReadByte(binaryReader);
+                TypeOfMessage = (MessageType)MessagesEncodingUtil.ReadByte(binaryReader);
 
-                IPEndPoint localEndPoint = ParseIpEndPoint(ReadString(binaryReader));
-                IPEndPoint publicEndPoint = ParseIpEndPoint(ReadString(binaryReader));
+                IPEndPoint localEndPoint = ParseIpEndPoint(MessagesEncodingUtil.ReadString(binaryReader));
+                IPEndPoint publicEndPoint = ParseIpEndPoint(MessagesEncodingUtil.ReadString(binaryReader));
 
                 PeerAddress = new PeerAddress(localEndPoint, publicEndPoint);
             }
@@ -49,17 +49,17 @@ namespace P2PCommunicationLibrary.Messages
                 MemoryStream outputStream = new MemoryStream();
                 BinaryWriter binaryWriter = new BinaryWriter(new BufferedStream(outputStream));
 
-                WriteMessageType(binaryWriter, this);
+                MessagesEncodingUtil.WriteMessageType(binaryWriter, this);
 
                 if (PeerAddress.PrivateEndPoint == null)
-                    WriteString(binaryWriter, "null");
+                    MessagesEncodingUtil.WriteString(binaryWriter, "null");
                 else
-                    WriteString(binaryWriter, PeerAddress.PrivateEndPoint.ToString());
+                    MessagesEncodingUtil.WriteString(binaryWriter, PeerAddress.PrivateEndPoint.ToString());
 
                 if (PeerAddress.PublicEndPoint == null)
-                    WriteString(binaryWriter, "null");
+                    MessagesEncodingUtil.WriteString(binaryWriter, "null");
                 else
-                    WriteString(binaryWriter, PeerAddress.PublicEndPoint.ToString());
+                    MessagesEncodingUtil.WriteString(binaryWriter, PeerAddress.PublicEndPoint.ToString());
 
                 binaryWriter.Flush();
 
