@@ -39,7 +39,7 @@ namespace P2PCommunicationLibrary.SuperPeer
             Port = port;
         }
         /// <summary>
-        /// Runs the server
+        /// Runs the Server
         /// </summary>
         public void Run()
         {
@@ -73,17 +73,17 @@ namespace P2PCommunicationLibrary.SuperPeer
         }
 
         /// <summary>
-        /// This event occurs when a client connects to the server
+        /// This event occurs when a Client connects to the server
         /// </summary>       
         private void ClientConnected_EventHandler(IServer sender, IClient client)
         {
             Task.Factory.StartNew(() =>
             {
-                var newClientConnection = new ClientConnectionManager(client);
+                var newClientConnection = new PeerConnectionManager(client);
                 newClientConnection.BeginProcessClientConnection();                
             });
 
-//            var newClientConnection = new ClientConnectionManager(client);
+//            var newClientConnection = new PeerConnectionManager(Client);
 //            newClientConnection.BeginProcessClientConnection();
 //
 //            Thread thread = new Thread(newClientConnection.BeginProcessClientConnection);

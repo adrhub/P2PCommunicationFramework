@@ -44,6 +44,7 @@ namespace Test
            
 
             server.AllowConnection(client.GetPeerAddress());
+            Thread.Sleep(1000);
             client.Connect(server.GetPeerAddress());
             
             //PeerAddress peerAddress = peer.GetPeerAddress();

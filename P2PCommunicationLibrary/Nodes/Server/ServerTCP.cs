@@ -14,7 +14,7 @@ namespace P2PCommunicationLibrary
         private MessageManager _messageManager;
 
         private int _backlog = 32;
-        private object _syncRoot = new object();
+        private readonly object _syncRoot = new object();
         #endregion
 
         #region Properties
@@ -41,7 +41,7 @@ namespace P2PCommunicationLibrary
                 {
                     _listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                     _listener.Bind(new IPEndPoint(Address, Port));
-                    // fire up the server
+                    // fire up the Server
                     _listener.Listen(_backlog);
 
                     // set listening bit
@@ -55,9 +55,9 @@ namespace P2PCommunicationLibrary
 
                     // Wait for connection
                     Socket newClient = _listener.Accept();
-                    Trace.WriteLine("Connected to new client");
+                    Trace.WriteLine("Connected to new Client");
 
-                    // queue a request to take care of the client
+                    // queue a request to take care of the Client
                     ProcessClient(new ClientTCP(newClient, _messageManager));
                     //ThreadPool.QueueUserWorkItem(new WaitCallback(ProcessClient), newClient);
                 }
