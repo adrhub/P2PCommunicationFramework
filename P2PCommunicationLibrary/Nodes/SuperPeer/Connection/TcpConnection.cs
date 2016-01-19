@@ -1,4 +1,6 @@
-﻿namespace P2PCommunicationLibrary.SuperPeer
+﻿using P2PCommunicationLibrary.Net;
+
+namespace P2PCommunicationLibrary.SuperPeer
 {
     class TcpConnection
     {

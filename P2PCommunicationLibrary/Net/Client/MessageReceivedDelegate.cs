@@ -1,7 +1,7 @@
 ﻿using System;
 using P2PCommunicationLibrary.Messages;
 
-namespace P2PCommunicationLibrary
+namespace P2PCommunicationLibrary.Net
 {
     internal delegate void MessageReceivedEventHandler(IClient sender, MessageEventArgs messageArgs);
 

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace P2PCommunicationLibrary
+namespace P2PCommunicationLibrary.Net
 {
     class ClientInfo
     {

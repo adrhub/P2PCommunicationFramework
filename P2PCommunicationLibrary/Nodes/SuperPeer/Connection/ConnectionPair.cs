@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using P2PCommunicationLibrary.Net;
 
 namespace P2PCommunicationLibrary.SuperPeer
 {
@@ -34,6 +35,16 @@ namespace P2PCommunicationLibrary.SuperPeer
                 return ((Client != null ? Client.GetSuperPeerClient().LocalEndPoint.ToString().GetHashCode() : 0)*397) 
                     ^ (Server != null ? Server.GetSuperPeerClient().LocalEndPoint.ToString().GetHashCode() : 0);
             }
+        }
+
+        public bool ContainsClient(IClient client)
+        {
+            return Client.GetSuperPeerClient() == client || Server.GetSuperPeerClient() == client;
+        }
+
+        public void CloseConnection()
+        {
+            throw new NotImplementedException();
         }
     }
 }

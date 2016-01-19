@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using P2PCommunicationLibrary.Messages;
+using P2PCommunicationLibrary.Net;
 
 namespace P2PCommunicationLibrary.SuperPeer
 {
@@ -16,7 +17,7 @@ namespace P2PCommunicationLibrary.SuperPeer
         public void BeginProcessClientMessages()
         {
             _superPeerNode.GetSuperPeerClient().MessageReceivedEvent += PeerOnMessageReceivedEvent;
-            _superPeerNode.GetSuperPeerClient().Listen();
+            _superPeerNode.GetSuperPeerClient().ListenMessages();
         }
 
         /// <summary>

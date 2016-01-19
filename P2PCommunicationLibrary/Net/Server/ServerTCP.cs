@@ -3,7 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using P2PCommunicationLibrary.Messages;
 
-namespace P2PCommunicationLibrary
+namespace P2PCommunicationLibrary.Net
 {
     class ServerTCP : IServer
     {
@@ -20,7 +20,7 @@ namespace P2PCommunicationLibrary
         #region Properties
         public IPAddress Address { get; private set; }
         public int Port { get; private set; }
-        public bool IsListening { get; private set; }
+        public bool IsListening { get; private set; }        
         #endregion
 
         #region Constructors
@@ -92,6 +92,22 @@ namespace P2PCommunicationLibrary
         {
             NewClientEvent(this, client);
         }
-        #endregion
+        #endregion        
+
+        public void Close()
+        {
+            lock (_syncRoot)
+            {
+                try
+                {
+                    IsListening = false;
+                    _listener.Close();
+                }
+                catch (SocketException se)
+                {
+                    Trace.WriteLine("SocketException: " + se.ErrorCode + " " + se.Message);
+                }
+            }
+        }    
     }
 }

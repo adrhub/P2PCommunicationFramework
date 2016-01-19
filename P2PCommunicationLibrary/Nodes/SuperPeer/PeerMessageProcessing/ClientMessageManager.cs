@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using P2PCommunicationLibrary.Messages;
+using P2PCommunicationLibrary.Net;
 
 namespace P2PCommunicationLibrary.SuperPeer
 {

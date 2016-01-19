@@ -4,6 +4,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using P2PCommunicationLibrary.Messages;
+using P2PCommunicationLibrary.Net;
 
 namespace P2PCommunicationLibrary.SuperPeer
 {
@@ -80,14 +81,12 @@ namespace P2PCommunicationLibrary.SuperPeer
             Task.Factory.StartNew(() =>
             {
                 var newClientConnection = new PeerConnectionManager(client);
-                newClientConnection.BeginProcessClientConnection();                
-            });
+                newClientConnection.BeginProcessClientConnection();
 
-//            var newClientConnection = new PeerConnectionManager(Client);
-//            newClientConnection.BeginProcessClientConnection();
-//
-//            Thread thread = new Thread(newClientConnection.BeginProcessClientConnection);
-//            thread.Start();
-        }                
+                var repositoryCleaner = new RepositoryCleaner();
+                client.ConnectionClosedEvent += repositoryCleaner.ClientOnConnectionClosedEvent;
+            });
+        }
+        
     }
 }

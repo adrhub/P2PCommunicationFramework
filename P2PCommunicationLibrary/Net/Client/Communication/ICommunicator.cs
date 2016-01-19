@@ -1,4 +1,4 @@
-﻿namespace P2PCommunicationLibrary
+﻿namespace P2PCommunicationLibrary.Net
 {
     interface ICommunicator
     {

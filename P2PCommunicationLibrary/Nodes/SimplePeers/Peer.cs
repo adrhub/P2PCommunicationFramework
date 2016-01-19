@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using P2PCommunicationLibrary.Messages;
+using P2PCommunicationLibrary.Net;
 
 namespace P2PCommunicationLibrary.Peers
 {

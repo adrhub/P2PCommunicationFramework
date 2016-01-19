@@ -1,13 +1,14 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.CompilerServices;
 using P2PCommunicationLibrary.Messages;
 
-namespace P2PCommunicationLibrary
+namespace P2PCommunicationLibrary.Net
 {
     abstract class ClientBase : IClient
     {
+        public event PeerClosedConnectionEventHandler ConnectionClosedEvent;
         public event MessageReceivedEventHandler MessageReceivedEvent;
 
         #region Private members
@@ -19,7 +20,7 @@ namespace P2PCommunicationLibrary
         protected MessageManager MessageManager { get; private set; }
         protected IPEndPoint ConnectionIpEndPoint { get; private set; }
 
-        public bool IsListening { get; private set; }
+        public bool IsListeningMessages { get; private set; }
 
         public IPEndPoint LocalEndPoint { get; protected set; }
         public IPEndPoint RemoteEndPoint { get; protected set; }                       
@@ -42,29 +43,28 @@ namespace P2PCommunicationLibrary
 
         public abstract BinaryMessageBase Read();
 
-        public void Listen()
+        public void ListenMessages()
         {
             lock (_socketMonitor)
             {
-                IsListening = true;
+                IsListeningMessages = true;
 
                 do
                 {
                     BinaryMessageBase receivedMessage = Read();
                     MessageReceivedEvent(this, new MessageEventArgs(receivedMessage));
 
-                } while (IsListening);
+                } while (IsListeningMessages);
             }
         }
 
-        public void StopListening()
+        public void StopListeningMessages()
         {
-            if (IsListening)
+            if (IsListeningMessages)
             {
                 lock (_socketMonitor)
-                {
-                    // set listening bit
-                    IsListening = false;
+                {                    
+                    IsListeningMessages = false;
                 }
             }
         }
@@ -74,14 +74,18 @@ namespace P2PCommunicationLibrary
             lock (_socketMonitor)
             {
                 try
-                {
-                    IsListening = false;
-                    ClientSocket.Close();
+                {                    
+                    IsListeningMessages = false;
+                    ClientSocket.Close();                    
+                    
                 }
                 catch (SocketException se)
                 {
                     Trace.WriteLine("SocketException: " + se.ErrorCode + " " + se.Message);
                 }
+
+                if (ConnectionClosedEvent != null)
+                    ConnectionClosedEvent.Invoke(this, new EventArgs());
             }
         }
     }

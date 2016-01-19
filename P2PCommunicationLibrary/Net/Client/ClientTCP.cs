@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using P2PCommunicationLibrary.Messages;
 
-namespace P2PCommunicationLibrary
+namespace P2PCommunicationLibrary.Net
 {
     class ClientTCP : ClientBase
     {        
