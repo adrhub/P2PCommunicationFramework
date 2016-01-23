@@ -2,7 +2,7 @@
 using P2PCommunicationLibrary.Messages;
 using P2PCommunicationLibrary.Net;
 
-namespace P2PCommunicationLibrary.Peers
+namespace P2PCommunicationLibrary.SimplePeers
 {
     public class ServerPeer
     {        

@@ -4,10 +4,11 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using System.Threading.Tasks;
 using P2PCommunicationLibrary.Messages;
 using P2PCommunicationLibrary.Net;
 
-namespace P2PCommunicationLibrary.Peers
+namespace P2PCommunicationLibrary.SimplePeers
 {
     class Peer
     {
@@ -62,10 +63,11 @@ namespace P2PCommunicationLibrary.Peers
             {              
                 InitSuperPeerConnection();
                 InitPeerType(clientType);
-                PeerAddress = InitPeerAddress();
+                PeerAddress = GetPeerAddress();
 
                 //Read confirmation message
                 _superPeerClient.Read();
+                RunSendPingMessageTask();
             }
             catch (SocketException se)
             {
@@ -92,7 +94,7 @@ namespace P2PCommunicationLibrary.Peers
             }           
         }
 
-        private PeerAddress InitPeerAddress()
+        private PeerAddress GetPeerAddress()
         {                      
             var requestMessage = new RequestMessage(MessageType.ClientPeerAddress);
             _superPeerClient.Send(requestMessage);
@@ -104,13 +106,41 @@ namespace P2PCommunicationLibrary.Peers
             return peerAddress;
         }
 
+        private void RunSendPingMessageTask()
+        {
+            PeriodicTask periodicTask = new PeriodicTask(
+                SendPingMessageToSuperPeer,
+                TimeSpan.FromSeconds(0),
+                TimeSpan.FromSeconds(30),
+                CancellationToken.None);
+
+            periodicTask.DoPeriodicWorkAsync();
+        }
+
+        private void SendPingMessageToSuperPeer()
+        {
+            Console.WriteLine("send...");
+            _superPeerClient.Send(new RequestMessage(MessageType.Ping));
+        }
+
         public void Close()
         {
-            if (IsRunning)
+            if (!IsRunning)
+                return;
+
+            IsRunning = false;
+
+            var closeConnectionMessage = new RequestMessage(MessageType.CloseConnection);
+            _superPeerClient.Send(closeConnectionMessage);
+
+            try
             {
-                IsRunning = false;
                 _superPeerClient.Close();
             }
+            catch (SocketException)
+            {        
+            }          
+                                  
         }                   
 
         private static IPAddress LocalIpAddress()
@@ -127,6 +157,6 @@ namespace P2PCommunicationLibrary.Peers
         public BinaryMessageBase ReadFromSuperPeer()
         {
             return _superPeerClient.Read();
-        }
+        }        
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using P2PCommunicationLibrary.Peers;
 
 namespace P2PCommunicationLibrary
 {

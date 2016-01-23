@@ -11,6 +11,7 @@
         Connection = 1,
         Request = 2,
         Confirmation = 3,
+        Ping = 4,
 
         TextMessage = 101,
 
@@ -20,6 +21,8 @@
         InitConnectionAsClient = 121,
         InitConnectionAsServer = 122,
         ConnectAsClient = 123,
-        ConnectAsServer = 124
+        ConnectAsServer = 124,
+
+        CloseConnection = 250
     }
 }

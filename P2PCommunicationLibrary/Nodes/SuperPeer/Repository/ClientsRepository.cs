@@ -32,17 +32,18 @@ namespace P2PCommunicationLibrary.SuperPeer
             }
         }
 
-        public static ClientInfo AddClient(IClient client)
+        public static void AddClient(IClient client, ClientInfo clientInfo)
         {
-            ClientInfo clientInfo = new ClientInfo(client);
-
             lock (ClientsMonitor)
-            {                
+            {
                 Clients.Add(client, clientInfo);
             }
-
-            return clientInfo;
         }
+
+        public static void AddClient(IClient client)
+        {
+            AddClient(client, new ClientInfo(client));      
+        }        
 
         public static ClientInfo GetClientInfo(IClient client)
         {

@@ -55,6 +55,7 @@ namespace P2PCommunicationLibrary.SuperPeer
             {
                 _server = new ServerTCP(Address, Port, _messageManager);
                 _server.NewClientEvent += ClientConnected_EventHandler;
+                RunConnectionCheckTask();
                 _server.Listen();
             }            
             catch (SocketException se)
@@ -62,6 +63,17 @@ namespace P2PCommunicationLibrary.SuperPeer
                 StopRunning();
                 throw;
             }
+        }
+
+        private static void RunConnectionCheckTask()
+        {
+            PeriodicTask periodicTask = new PeriodicTask(
+                RepositoryCleaner.CheckClientsConnection, 
+                TimeSpan.FromSeconds(5),
+                TimeSpan.FromSeconds(30), 
+                CancellationToken.None);
+
+            periodicTask.DoPeriodicWorkAsync();
         }
 
         public void StopRunning()
@@ -79,12 +91,8 @@ namespace P2PCommunicationLibrary.SuperPeer
         private void ClientConnected_EventHandler(IServer sender, IClient client)
         {
             Task.Factory.StartNew(() =>
-            {
-                var newClientConnection = new PeerConnectionManager(client);
-                newClientConnection.BeginProcessClientConnection();
-
-                var repositoryCleaner = new RepositoryCleaner();
-                client.ConnectionClosedEvent += repositoryCleaner.ClientOnConnectionClosedEvent;
+            {                                
+                new PeerConnectionManager(client).BeginProcessClientConnection();                
             });
         }
         

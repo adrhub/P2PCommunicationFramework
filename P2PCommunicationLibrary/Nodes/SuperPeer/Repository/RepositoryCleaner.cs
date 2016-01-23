@@ -1,21 +1,78 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using P2PCommunicationLibrary.Net;
 
 namespace P2PCommunicationLibrary.SuperPeer
 {
-    class RepositoryCleaner
+    static class RepositoryCleaner
     {
-        public void BeginCleanRepository()
+        public static void CheckClientsConnection()
         {
-            
+            Console.WriteLine("check...");
+
+            Console.WriteLine("Clients :" + ClientRepository.GetClients().Count
+               + "\nConnections :" + ConnectionsRepository.GetConnections().Count
+               + "\nPeerClients :" + ConnectionsRepository.GetClients().Count
+               + "\nPeerServers :" + ConnectionsRepository.GetServers().Count);
+
+            CheckClientsLastPingMessageDateTime();
+            CheckSocketConnection();
         }
 
-        public void ClientOnConnectionClosedEvent(IClient client, EventArgs enentArgs)
+        private static void CheckSocketConnection()
         {
+            foreach (IClient client in ClientRepository.GetClients())
+            {
+                if (!client.ClientSocket.IsConnected())
+                    CleanRepositories(client);
+            }
+        }
+
+        private static bool IsConnected(this Socket socket)
+        {
+            try
+            {
+                return !(socket.Poll(1, SelectMode.SelectRead) && socket.Available == 0);
+            }
+            catch (SocketException)
+            {
+                return false;
+            }
+        }
+
+        private static void CheckClientsLastPingMessageDateTime()
+        {
+            foreach (IClient client in ClientRepository.GetClients())
+            {
+                DateTime lastPingMessageDateTime = ClientRepository.GetClientInfo(client).LastPingMesssageDateTime;
+
+                if ((DateTime.Now - lastPingMessageDateTime).TotalSeconds > 60)
+                    CleanRepositories(client);
+            }
+        }
+
+        public static void ClientOnConnectionClosedEvent(IClient client, EventArgs enentArgs)
+        {
+            CleanRepositories(client);
+        }
+
+        public static void CleanRepositories(IClient client)
+        {
+            Console.WriteLine("clear...");
+            Console.WriteLine("Clients :" + ClientRepository.GetClients().Count
+                + "\nConnections :" + ConnectionsRepository.GetConnections().Count
+                + "\nPeerClients :" + ConnectionsRepository.GetClients().Count
+                + "\nPeerServers :" + ConnectionsRepository.GetServers().Count);
+
             CleanClientRepository(client);
             CleanConnectionRepository(client);
+
+            Console.WriteLine("Clients :" + ClientRepository.GetClients().Count
+                + "\nConnections :" + ConnectionsRepository.GetConnections().Count
+                + "\nPeerClients :" + ConnectionsRepository.GetClients().Count
+                + "\nPeerServers :" + ConnectionsRepository.GetServers().Count);
         }
 
         private static void CleanConnectionRepository(IClient closedClient)
@@ -32,7 +89,7 @@ namespace P2PCommunicationLibrary.SuperPeer
             foreach (ConnectionPair connectionPair in connectionPairList.Where(connectionPair => connectionPair.ContainsClient(closedClient)))
             {
                 ConnectionsRepository.RemoveConnection(connectionPair);
-                connectionPair.CloseConnection();
+               //TODO: connectionPair.CloseConnection();
             }
         }
 

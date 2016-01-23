@@ -7,10 +7,22 @@ namespace P2PCommunicationLibrary.SuperPeer
     class PeerConnectionManager
     {
         private readonly IClient _client;
+        private ClientInfo _clientInfo;
 
         public PeerConnectionManager(IClient client)
         {
             _client = client;
+            _clientInfo = new ClientInfo(client); 
+                                  
+            _client.ConnectionClosedEvent += RepositoryCleaner.ClientOnConnectionClosedEvent;
+
+            Console.WriteLine("Client " + _client.RemoteEndPoint + " " + _client.LocalEndPoint + " Connected");
+        }
+
+        private void InitClientInfo()
+        {           
+            _clientInfo.ConnectionDateTime(DateTime.Now);
+            _clientInfo.LastPingMesssageDateTime = DateTime.Now;           
         }
 
         public void BeginProcessClientConnection()
@@ -20,19 +32,20 @@ namespace P2PCommunicationLibrary.SuperPeer
             if (!clientConnected)
                 return;
 
-            Console.WriteLine("Client " + _client.RemoteEndPoint + " " + _client.LocalEndPoint + " Connected");
+            InitPeerType();            
 
-            ClientType clientType = GetPeerType();
-
-            if (clientType == ClientType.None)
+            if (_clientInfo.ClientType() == ClientType.None)
                 return;
 
-             AddClientToRepositoryAndInitClientInfo(clientType);
+            InitClientAddress();
+            InitClientInfo();
+
+            ClientRepository.AddClient(_client, _clientInfo);
+            
+            SuperPeerNode superPeerNode = GetSuperPeerNodeByClientType(_clientInfo.ClientType());
+            AddSuperPeerNodeToConnectionsRepository(_clientInfo.ClientType(), superPeerNode);
 
             _client.Send(new ConfirmationMessage(MessageType.Connection));
-
-            SuperPeerNode superPeerNode = GetSuperPeerNodeByClientType(clientType);           
-            AddSuperPeerNodeToConnectionsRepository(clientType, superPeerNode);
 
             PeerMessageManager peerMessageManager = new PeerMessageManager(superPeerNode);
             peerMessageManager.BeginProcessClientMessages();
@@ -78,7 +91,7 @@ namespace P2PCommunicationLibrary.SuperPeer
             return clientConnected;
         }
 
-        private ClientType GetPeerType()
+        private void InitPeerType()
         {
             var message = _client.Read();
 
@@ -91,19 +104,20 @@ namespace P2PCommunicationLibrary.SuperPeer
                 switch (requestMessage.RequestedMessageType)
                 {
                     case MessageType.InitConnectionAsClient:
-                        return ClientType.Client;
+                        _clientInfo.ClientType(ClientType.Client);
+                        break;
                     case MessageType.InitConnectionAsServer:
-                        return ClientType.Server;
+                        _clientInfo.ClientType(ClientType.Server);
+                        break;
                     default:
+                        _clientInfo.ClientType(ClientType.None);
                         _client.Close();
                         break;
                 }
-            }
-
-            return ClientType.None;
+            }           
         }
 
-        private void AddClientToRepositoryAndInitClientInfo(ClientType clientType)
+        private void InitClientAddress()
         {
             var requestMessage = _client.Read() as RequestMessage;
 
@@ -114,8 +128,7 @@ namespace P2PCommunicationLibrary.SuperPeer
                 _client.Send(new PeerAddressMessage(peerAddress, MessageType.ClientPeerAddress));
                 peerAddress.PrivateEndPoint = ((PeerAddressMessage) _client.Read()).PeerAddress.PrivateEndPoint;
 
-                ClientInfo info = ClientRepository.AddClient(_client);
-                info.ClientType(clientType).ConnectionDateTime(DateTime.Now).PeerAddress(peerAddress);
+                _clientInfo.PeerAddress(peerAddress);                                               
             }
             else
                 _client.Close();

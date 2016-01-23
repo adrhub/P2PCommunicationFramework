@@ -35,6 +35,12 @@ namespace P2PCommunicationLibrary.SuperPeer
                 case MessageType.Request:
                     switch (((RequestMessage)message).RequestedMessageType)
                     {
+                        case MessageType.Ping:
+                            _superPeerNode.GetClientInfo().LastPingMesssageDateTime = DateTime.Now;
+                            break;
+                        case MessageType.CloseConnection:                            
+                            _superPeerNode.GetSuperPeerClient().Close();                           
+                            break;
                     }
                     break;               
 

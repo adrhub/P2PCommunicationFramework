@@ -5,6 +5,8 @@ namespace P2PCommunicationLibrary.Net
     class ClientInfo
     {
         public IClient Client { get; private set; }
+        public DateTime LastPingMesssageDateTime { get; set; }
+
         private DateTime _connectionDateTime;
         private PeerAddress _peerAddress;
         private ClientType _clientType;
@@ -45,6 +47,6 @@ namespace P2PCommunicationLibrary.Net
         {
             _clientType = clientType;
             return this;
-        }
+        }       
     }
 }
