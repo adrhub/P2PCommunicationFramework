@@ -74,10 +74,9 @@ namespace P2PCommunicationLibrary.Net
             lock (_socketMonitor)
             {
                 try
-                {                    
-                    IsListeningMessages = false;
-                    ClientSocket.Close();                    
-                    
+                {
+                    StopListeningMessages();
+                    ClientSocket.Close();
                 }
                 catch (SocketException se)
                 {

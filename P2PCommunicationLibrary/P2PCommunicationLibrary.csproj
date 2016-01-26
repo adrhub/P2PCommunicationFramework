@@ -57,6 +57,7 @@
     <Compile Include="Messages\MessageTypeEnum.cs" />
     <Compile Include="Net\IPeer.cs" />
     <Compile Include="Net\Client\PeerClosedConnectionDelegate.cs" />
+    <Compile Include="Nodes\SuperPeer\Connection\Connection.cs" />
     <Compile Include="Nodes\SuperPeer\PeerMessageProcessing\ClientMessageManager.cs" />
     <Compile Include="Nodes\SuperPeer\PeerMessageProcessing\PeerMessageManager.cs" />
     <Compile Include="Net\Client\ClientBase.cs" />

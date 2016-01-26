@@ -12,13 +12,18 @@ namespace P2PCommunicationLibrary.SuperPeer
         {
             Console.WriteLine("check...");
 
-            Console.WriteLine("Clients :" + ClientRepository.GetClients().Count
-               + "\nConnections :" + ConnectionsRepository.GetConnections().Count
-               + "\nPeerClients :" + ConnectionsRepository.GetClients().Count
-               + "\nPeerServers :" + ConnectionsRepository.GetServers().Count);
+            DisplayRepositoryState();
 
             CheckClientsLastPingMessageDateTime();
             CheckSocketConnection();
+        }
+
+        private static void DisplayRepositoryState()
+        {
+            Console.WriteLine("Clients :" + ClientRepository.GetClients().Count
+                              + "\nConnections :" + ConnectionsRepository.GetConnections().Count
+                              + "\nPeerClients :" + ConnectionsRepository.GetClients().Count
+                              + "\nPeerServers :" + ConnectionsRepository.GetServers().Count);
         }
 
         private static void CheckSocketConnection()
@@ -61,18 +66,12 @@ namespace P2PCommunicationLibrary.SuperPeer
         public static void CleanRepositories(IClient client)
         {
             Console.WriteLine("clear...");
-            Console.WriteLine("Clients :" + ClientRepository.GetClients().Count
-                + "\nConnections :" + ConnectionsRepository.GetConnections().Count
-                + "\nPeerClients :" + ConnectionsRepository.GetClients().Count
-                + "\nPeerServers :" + ConnectionsRepository.GetServers().Count);
+            DisplayRepositoryState();
 
             CleanClientRepository(client);
             CleanConnectionRepository(client);
 
-            Console.WriteLine("Clients :" + ClientRepository.GetClients().Count
-                + "\nConnections :" + ConnectionsRepository.GetConnections().Count
-                + "\nPeerClients :" + ConnectionsRepository.GetClients().Count
-                + "\nPeerServers :" + ConnectionsRepository.GetServers().Count);
+            DisplayRepositoryState();
         }
 
         private static void CleanConnectionRepository(IClient closedClient)
@@ -89,7 +88,7 @@ namespace P2PCommunicationLibrary.SuperPeer
             foreach (ConnectionPair connectionPair in connectionPairList.Where(connectionPair => connectionPair.ContainsClient(closedClient)))
             {
                 ConnectionsRepository.RemoveConnection(connectionPair);
-               //TODO: connectionPair.CloseConnection();
+                connectionPair.CloseConnection(closedClient);
             }
         }
 

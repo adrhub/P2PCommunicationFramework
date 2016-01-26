@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Threading.Tasks;
 using P2PCommunicationLibrary.Net;
 
 namespace P2PCommunicationLibrary.SuperPeer
 {
     class ConnectionPair
-    {       
+    {
+        private Connection _connection;
+               
         public SuperPeerClient Client { get; private set; }
         public SuperPeerServer Server{ get; private set; }         
 
@@ -12,6 +15,28 @@ namespace P2PCommunicationLibrary.SuperPeer
         {
             Server = server;
             Client = client;
+        }
+
+        public void ProcessConnection()
+        {
+            if (Server.GetClientInfo().PeerAddress().PublicEndPoint.Equals(
+                Client.GetClientInfo().PeerAddress().PublicEndPoint))
+            {
+                _connection = new TcpConnection(Server, Client);
+            }
+
+            if ( _connection != null)
+                _connection.ProcessConnection();
+        }
+
+        public bool ContainsClient(IClient client)
+        {
+            return Client.GetSuperPeerClient() == client || Server.GetSuperPeerClient() == client;
+        }
+
+        public void CloseConnection(IClient closedClient)
+        {
+            _connection.Close(closedClient);           
         }
 
         protected bool Equals(ConnectionPair other)
@@ -37,14 +62,6 @@ namespace P2PCommunicationLibrary.SuperPeer
             }
         }
 
-        public bool ContainsClient(IClient client)
-        {
-            return Client.GetSuperPeerClient() == client || Server.GetSuperPeerClient() == client;
-        }
-
-        public void CloseConnection()
-        {
-            throw new NotImplementedException();
-        }
+        
     }
 }

@@ -26,18 +26,16 @@ namespace P2PCommunicationLibrary.SuperPeer
         }
 
         public void BeginProcessClientConnection()
-        {
-            var clientConnected = InitClientConnection();
+        {       
+            if (!InitClientConnection())
+                return;                    
 
-            if (!clientConnected)
+            if (!InitPeerType())
                 return;
 
-            InitPeerType();            
-
-            if (_clientInfo.ClientType() == ClientType.None)
+            if (!InitClientAddress())
                 return;
 
-            InitClientAddress();
             InitClientInfo();
 
             ClientRepository.AddClient(_client, _clientInfo);
@@ -91,7 +89,7 @@ namespace P2PCommunicationLibrary.SuperPeer
             return clientConnected;
         }
 
-        private void InitPeerType()
+        private bool InitPeerType()
         {
             var message = _client.Read();
 
@@ -105,19 +103,21 @@ namespace P2PCommunicationLibrary.SuperPeer
                 {
                     case MessageType.InitConnectionAsClient:
                         _clientInfo.ClientType(ClientType.Client);
-                        break;
+                        return true;
                     case MessageType.InitConnectionAsServer:
                         _clientInfo.ClientType(ClientType.Server);
-                        break;
+                        return true;
                     default:
                         _clientInfo.ClientType(ClientType.None);
                         _client.Close();
                         break;
                 }
-            }           
+            }
+
+            return false;
         }
 
-        private void InitClientAddress()
+        private bool InitClientAddress()
         {
             var requestMessage = _client.Read() as RequestMessage;
 
@@ -128,10 +128,14 @@ namespace P2PCommunicationLibrary.SuperPeer
                 _client.Send(new PeerAddressMessage(peerAddress, MessageType.ClientPeerAddress));
                 peerAddress.PrivateEndPoint = ((PeerAddressMessage) _client.Read()).PeerAddress.PrivateEndPoint;
 
-                _clientInfo.PeerAddress(peerAddress);                                               
+                _clientInfo.PeerAddress(peerAddress);
+                return true;
             }
             else
+            {
                 _client.Close();
+                return false;
+            }
         }
     }
 }

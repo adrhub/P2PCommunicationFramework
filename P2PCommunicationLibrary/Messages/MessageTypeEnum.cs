@@ -23,6 +23,8 @@
         ConnectAsClient = 123,
         ConnectAsServer = 124,
 
+        TcpConnection = 151,        
+
         CloseConnection = 250
     }
 }
