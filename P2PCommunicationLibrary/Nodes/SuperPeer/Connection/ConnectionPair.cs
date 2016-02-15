@@ -9,7 +9,7 @@ namespace P2PCommunicationLibrary.SuperPeer
         private Connection _connection;
                
         public SuperPeerClient Client { get; private set; }
-        public SuperPeerServer Server{ get; private set; }         
+        public SuperPeerServer Server { get; private set; }         
 
         public ConnectionPair(SuperPeerServer server, SuperPeerClient client)
         {
@@ -19,8 +19,8 @@ namespace P2PCommunicationLibrary.SuperPeer
 
         public void ProcessConnection()
         {
-            if (Server.GetClientInfo().PeerAddress().PublicEndPoint.Equals(
-                Client.GetClientInfo().PeerAddress().PublicEndPoint))
+            if (Server.GetClientInfo().PeerAddress().PublicEndPoint.Address.Equals(
+                Client.GetClientInfo().PeerAddress().PublicEndPoint.Address))
             {
                 _connection = new TcpConnection(Server, Client);
             }

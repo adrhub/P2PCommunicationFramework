@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Net.Sockets;
 using P2PCommunicationLibrary.Messages;
 
@@ -14,7 +15,7 @@ namespace P2PCommunicationLibrary.Net
         }
 
         public byte[] Read()
-        {
+        {            
             NetworkStream networkStream = new NetworkStream(_communicationSocket);
             BinaryReader binaryReader = new BinaryReader(networkStream);
 

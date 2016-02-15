@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using P2PCommunicationLibrary.Messages;
@@ -48,6 +49,10 @@ namespace P2PCommunicationLibrary.Net
             {
                 Close();
             }
+            catch (IOException)
+            {
+                Close();
+            }
             catch (BinaryEncodingException)
             {
                 Console.WriteLine("BinaryEncodingException: Encode");
@@ -66,7 +71,11 @@ namespace P2PCommunicationLibrary.Net
             }
             catch (SocketException)
             {
-                Close();                
+                Close();
+            }
+            catch (IOException)
+            {
+                Close();
             }
             catch(BinaryEncodingException)
             {

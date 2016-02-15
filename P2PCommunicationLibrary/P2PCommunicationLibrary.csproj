@@ -57,6 +57,10 @@
     <Compile Include="Messages\MessageTypeEnum.cs" />
     <Compile Include="Net\IPeer.cs" />
     <Compile Include="Net\Client\PeerClosedConnectionDelegate.cs" />
+    <Compile Include="Nodes\SimplePeers\ServerPeer\ClientConnectedToServerPeerEventHandler.cs" />
+    <Compile Include="Nodes\SimplePeers\ServerPeer\Connection\Connection.cs" />
+    <Compile Include="Nodes\SimplePeers\ServerPeer\Connection\TcpConnection.cs" />
+    <Compile Include="Nodes\SimplePeers\ServerPeer\ServerInstances\TcpServerSingleton.cs" />
     <Compile Include="Nodes\SuperPeer\Connection\Connection.cs" />
     <Compile Include="Nodes\SuperPeer\PeerMessageProcessing\ClientMessageManager.cs" />
     <Compile Include="Nodes\SuperPeer\PeerMessageProcessing\PeerMessageManager.cs" />
@@ -66,13 +70,13 @@
     <Compile Include="Net\Client\Communication\ICommunicator.cs" />
     <Compile Include="Net\Client\SuperPeerClientData\ClientInfo.cs" />
     <Compile Include="Nodes\PeerAddress.cs" />
-    <Compile Include="Nodes\SimplePeers\ClientPeer.cs" />
+    <Compile Include="Nodes\SimplePeers\ClientPeer\ClientPeer.cs" />
     <Compile Include="Nodes\SimplePeers\Peer.cs" />
     <Compile Include="Net\Client\ClientTCP.cs" />
     <Compile Include="Net\Client\IClient.cs" />
     <Compile Include="Net\Client\MessageReceivedDelegate.cs" />
     <Compile Include="Net\Client\SuperPeerClientData\ClientTypeEnum.cs" />
-    <Compile Include="Nodes\SimplePeers\ServerPeer.cs" />
+    <Compile Include="Nodes\SimplePeers\ServerPeer\ServerPeer.cs" />
     <Compile Include="Net\Server\ClientConnectedDelegate.cs" />
     <Compile Include="Net\Server\IServer.cs" />
     <Compile Include="Net\Server\ServerTCP.cs" />

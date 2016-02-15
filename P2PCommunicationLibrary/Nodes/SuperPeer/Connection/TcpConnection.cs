@@ -15,10 +15,14 @@ namespace P2PCommunicationLibrary.SuperPeer
             IClient server = Server.GetSuperPeerClient();
             IClient client = Client.GetSuperPeerClient();
 
+            //say to server to run listener
             server.Send(new RequestMessage(MessageType.TcpConnection));
-            server.Read(); //read confirmation message, check is server is ready
+            //read confirmation message, check if server is ready
+            server.Read(); 
 
+            //say to client that he can connect to the server
             client.Send(new RequestMessage(MessageType.TcpConnection));
+            //read confirmation message, check if client connected to the server
             client.Read();
         }         
     }

@@ -32,7 +32,7 @@ namespace P2PCommunicationLibrary.SimplePeers
         }    
         
         public Peer(IPEndPoint superPeerEndPoint)
-        {
+        {                                  
             InitMessageManager();
             _superPeerEndPoint = superPeerEndPoint;
         }
@@ -157,6 +157,26 @@ namespace P2PCommunicationLibrary.SimplePeers
         public BinaryMessageBase ReadFromSuperPeer()
         {
             return _superPeerClient.Read();
-        }        
+        }       
+
+        public void AddMethodToMessageReceivedEvent(MessageReceivedEventHandler messageReceivedEventHandler)
+        {
+            _superPeerClient.MessageReceivedEvent += messageReceivedEventHandler;
+        }
+
+        public void RemoveMethodFromMessageReceivedEvent(MessageReceivedEventHandler messageReceivedEventHandler)
+        {
+            _superPeerClient.MessageReceivedEvent -= messageReceivedEventHandler;
+        }
+
+        public void StartListenMessagesFromSuperPeer()
+        {
+            _superPeerClient.ListenMessages();
+        }
+
+        public void StopListenMessagesFromSuperPeer()
+        {
+            _superPeerClient.ListenMessages();
+        }
     }
 }
