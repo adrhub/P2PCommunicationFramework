@@ -2,13 +2,15 @@
 using System.Threading.Tasks;
 using P2PCommunicationLibrary.Messages;
 using P2PCommunicationLibrary.Net;
+using P2PCommunicationLibrary.SimplePeers.ServerPeer.ServerInstances;
 
-namespace P2PCommunicationLibrary.SimplePeers
+namespace P2PCommunicationLibrary.SimplePeers.ServerPeer
 {
     public class ServerPeer
     {        
-        private Peer Peer { get; }     
-        
+        internal Peer Peer { get; }
+        public IPEndPoint ServerPeerEndPoint { get; private set; }
+
         event ClientConnectedToServerPeerEventHandler clientConnectedToServerPeerEvent;
 
         public IEncryptor Encryptor
@@ -20,16 +22,41 @@ namespace P2PCommunicationLibrary.SimplePeers
         public ServerPeer(IPEndPoint superPeerEndPoint)
         {            
             Peer = new Peer(superPeerEndPoint);            
-        }
+        }        
 
         public ServerPeer(IPEndPoint superPeerEndPoint, IEncryptor encryptor)
         {
             Peer = new Peer(superPeerEndPoint, encryptor);
         }
 
+        public ServerPeer(IPEndPoint superPeerEndPoint, IPEndPoint serverPeerEndPoint)
+            : this(superPeerEndPoint)
+        {
+            ServerPeerEndPoint = serverPeerEndPoint;
+        }
+
+        public ServerPeer(IPEndPoint superPeerEndPoint, IPEndPoint serverPeerEndPoint, IEncryptor encryptor)
+            : this(superPeerEndPoint, encryptor)
+        {
+            ServerPeerEndPoint = serverPeerEndPoint;
+        }
+
         public void Run()
         {
             Peer.Run(ClientType.Server);
+
+            ProcessSuperPeerMessages();
+            SetServerInstancesInitData();
+        }
+
+        private void SetServerInstancesInitData()
+        {
+            TcpServerSingleton.SetEncryptor(Encryptor);
+            TcpServerSingleton.SetServerEndPoint(ServerPeerEndPoint);
+        }
+
+        private void ProcessSuperPeerMessages()
+        {
             Peer.AddMethodToMessageReceivedEvent(ProcessSuperPeerMessages);
             Task.Factory.StartNew(() => Peer.StartListenMessagesFromSuperPeer());
         }
@@ -53,11 +80,13 @@ namespace P2PCommunicationLibrary.SimplePeers
 
         private void ProcessSuperPeerMessages(IClient client, MessageEventArgs messageEventArgs)
         {                      
-            MessageType messageType = messageEventArgs.Message.TypeOfMessage;          
+            RequestMessage requestMessage = (RequestMessage)messageEventArgs.Message;          
               
-            switch (messageType)
+            switch (requestMessage.RequestedMessageType)
             {
                 case MessageType.TcpConnection:
+                    ServerPeerConnection serverPeerConnection = new TcpServerPeerConnection(this, GetPeerAddress());
+                    serverPeerConnection.ProcessConnection();
                     break;
             }             
         }

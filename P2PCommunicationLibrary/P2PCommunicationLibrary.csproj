@@ -57,9 +57,11 @@
     <Compile Include="Messages\MessageTypeEnum.cs" />
     <Compile Include="Net\IPeer.cs" />
     <Compile Include="Net\Client\PeerClosedConnectionDelegate.cs" />
+    <Compile Include="Nodes\SimplePeers\ClientPeer\Connection\ClientPeerConnection.cs" />
+    <Compile Include="Nodes\SimplePeers\ClientPeer\Connection\TcpClientPeerConnection.cs" />
     <Compile Include="Nodes\SimplePeers\ServerPeer\ClientConnectedToServerPeerEventHandler.cs" />
-    <Compile Include="Nodes\SimplePeers\ServerPeer\Connection\Connection.cs" />
-    <Compile Include="Nodes\SimplePeers\ServerPeer\Connection\TcpConnection.cs" />
+    <Compile Include="Nodes\SimplePeers\ServerPeer\Connection\ServerPeerConnection.cs" />
+    <Compile Include="Nodes\SimplePeers\ServerPeer\Connection\TcpServerPeerConnection.cs" />
     <Compile Include="Nodes\SimplePeers\ServerPeer\ServerInstances\TcpServerSingleton.cs" />
     <Compile Include="Nodes\SuperPeer\Connection\Connection.cs" />
     <Compile Include="Nodes\SuperPeer\PeerMessageProcessing\ClientMessageManager.cs" />

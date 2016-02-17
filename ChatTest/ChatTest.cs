@@ -15,7 +15,7 @@ namespace ChatTest
     {
         static void Main(string[] args)
         {
-            SuperPeer s = new SuperPeer(IPAddress.Parse("127.1.0.0"), 8090);
+            SuperPeer s = new SuperPeer(IPAddress.Parse("127.0.0.1"), 8090);
             s.Run();               
         }
 

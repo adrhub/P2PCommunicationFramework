@@ -2,7 +2,7 @@
 using P2PCommunicationLibrary.Messages;
 using P2PCommunicationLibrary.Net;
 
-namespace P2PCommunicationLibrary.SimplePeers
+namespace P2PCommunicationLibrary.SimplePeers.ClientPeer
 {
     public class ClientPeer
     {
@@ -43,6 +43,18 @@ namespace P2PCommunicationLibrary.SimplePeers
         {
             var connectAsServerMessage = new PeerAddressMessage(peerAddress, MessageType.ConnectAsClient);
             Peer.SendToSuperPeer(connectAsServerMessage);
+            var connectionAllowed = (RequestMessage)Peer.ReadFromSuperPeer();
+        }
+
+        private void ProcessConnectionToServerPeer(RequestMessage requestMessage)
+        {
+            switch (requestMessage.RequestedMessageType)
+            {
+                case MessageType.TcpConnection:
+                    var connection = new TcpClientPeerConnection(this, Peer.PeerAddress);
+                    connection.ProcessConnection();
+                    break;
+            }
         }
     }
 }

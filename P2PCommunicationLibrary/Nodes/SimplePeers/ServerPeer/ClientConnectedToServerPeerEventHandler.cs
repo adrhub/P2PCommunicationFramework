@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace P2PCommunicationLibrary.SimplePeers
+﻿namespace P2PCommunicationLibrary.SimplePeers.ServerPeer
 {
-    public delegate void ClientConnectedToServerPeerEventHandler(ServerPeer serverPeer, ClientPeer clientPeer);
+    public delegate void ClientConnectedToServerPeerEventHandler(ServerPeer serverPeer, ClientPeer.ClientPeer clientPeer);
 }

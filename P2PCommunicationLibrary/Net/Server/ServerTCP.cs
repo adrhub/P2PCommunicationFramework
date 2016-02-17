@@ -90,8 +90,10 @@ namespace P2PCommunicationLibrary.Net
         #region Private Methods
         private void ProcessClient(IClient client)
         {
-            NewClientEvent(this, client);
+            if (NewClientEvent != null)
+                NewClientEvent(this, client);
         }
+
         #endregion        
 
         public void Close()
