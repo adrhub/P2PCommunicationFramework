@@ -6,7 +6,7 @@ namespace P2PCommunicationLibrary.SimplePeers.ClientPeer
 {
     public class ClientPeer
     {
-        private Peer Peer { get; }
+        internal Peer Peer { get; }
 
         public IEncryptor Encryptor
         {
@@ -43,7 +43,9 @@ namespace P2PCommunicationLibrary.SimplePeers.ClientPeer
         {
             var connectAsServerMessage = new PeerAddressMessage(peerAddress, MessageType.ConnectAsClient);
             Peer.SendToSuperPeer(connectAsServerMessage);
-            var connectionAllowed = (RequestMessage)Peer.ReadFromSuperPeer();
+
+            var connectionAllowed = (RequestMessage) Peer.ReadFromSuperPeer();
+            ProcessConnectionToServerPeer(connectionAllowed);
         }
 
         private void ProcessConnectionToServerPeer(RequestMessage requestMessage)

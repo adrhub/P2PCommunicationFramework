@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Net;
 using System.Threading;
 using P2PCommunicationLibrary.Messages;
 using P2PCommunicationLibrary.Net;
-using P2PCommunicationLibrary.SimplePeers.ServerPeer.ServerInstances;
 
 namespace P2PCommunicationLibrary.SimplePeers.ServerPeer
 {
@@ -10,16 +10,19 @@ namespace P2PCommunicationLibrary.SimplePeers.ServerPeer
     {
         private ServerTCP _server;
 
-        public TcpServerPeerConnection(ServerPeer serverPeer, PeerAddress peerAddress)
-            : base(serverPeer, peerAddress)
+        public TcpServerPeerConnection(ServerPeer serverPeer)
+            : base(serverPeer)
         {           
         }
 
         public override void ProcessConnection()
         {            
-            _server = TcpServerSingleton.GetInstance();
+            _server = ServerPeer.GetTcpServerInstance();
             AllowClientToConnect();
-            ServerPeer.Peer.SendToSuperPeer(new ConfirmationMessage(MessageType.TcpConnection));
+            var serverPrivateIpEndPoint = new IPEndPoint(ServerPeer.GetPeerAddress().PrivateEndPoint.Address, ServerPeer.ServerPeerPort);
+
+            ServerPeer.Peer.SendToSuperPeer(new PeerAddressMessage(new PeerAddress {PrivateEndPoint = serverPrivateIpEndPoint}));           
+            Console.WriteLine("...message sent...");
         }
 
         private void AllowClientToConnect()
@@ -39,10 +42,9 @@ namespace P2PCommunicationLibrary.SimplePeers.ServerPeer
         {
             PeerAddressMessage peerAddressMessage = (PeerAddressMessage) newClient.Read();
 
-            if (!(peerAddressMessage.PeerAddress.Equals(PeerAddress)
-                  & newClient.RemoteEndPoint.Equals(PeerAddress.PublicEndPoint)))
+            if (!(peerAddressMessage.PeerAddress.Equals(ServerPeer.GetPeerAddress())
+                  & newClient.RemoteEndPoint.Equals(ServerPeer.GetPeerAddress().PublicEndPoint)))
                 return;
-
 
             RemoveMethodFromNewClientEvent(_server, ServerOnNewClientEvent);
         }        

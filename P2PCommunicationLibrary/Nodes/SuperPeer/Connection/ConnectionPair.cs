@@ -18,15 +18,33 @@ namespace P2PCommunicationLibrary.SuperPeer
         }
 
         public void ProcessConnection()
-        {
+        {            
             if (Server.GetClientInfo().PeerAddress().PublicEndPoint.Address.Equals(
                 Client.GetClientInfo().PeerAddress().PublicEndPoint.Address))
             {
                 _connection = new TcpConnection(Server, Client);
             }
 
-            if ( _connection != null)
+            if (_connection != null)
+            {
+//              StopListeningMessagesFromSuperPeerNode(Client);
+//              StopListeningMessagesFromSuperPeerNode(Server);
+               
                 _connection.ProcessConnection();
+               
+//              StartListeningMessagesFromSuperPeerNode(Client);
+//              StartListeningMessagesFromSuperPeerNode(Server);                            
+            }
+        }
+
+        private void StopListeningMessagesFromSuperPeerNode(SuperPeerNode superPeerNode)
+        {
+            superPeerNode.GetClientInfo().Client.StopListeningMessages();
+        }
+
+        private void StartListeningMessagesFromSuperPeerNode(SuperPeerNode superPeerNode)
+        {
+            superPeerNode.GetClientInfo().Client.ListenMessages();
         }
 
         public bool ContainsClient(IClient client)

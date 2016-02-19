@@ -16,12 +16,12 @@ namespace P2PCommunicationLibrary.SuperPeer
             IClient client = Client.GetSuperPeerClient();
 
             //say to server to run listener
-            server.Send(new RequestMessage(MessageType.TcpConnection));
-            //read confirmation message, check if server is ready
-            server.Read(); 
+            server.Send(new RequestMessage(MessageType.TcpConnection)); // 2
+            //read confirmation message, check if server is ready; read port
+            var serverPrivateIpEndPoint = (PeerAddressMessage)server.Read(); // 111
 
-            //say to client that he can connect to the server
-            client.Send(new RequestMessage(MessageType.TcpConnection));
+            //say to client that he can connect to the server; send port
+            client.Send(serverPrivateIpEndPoint);
             //read confirmation message, check if client connected to the server
             client.Read();
         }         

@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using P2PCommunicationLibrary.Messages;
 
 namespace P2PCommunicationLibrary.Net
@@ -40,47 +41,55 @@ namespace P2PCommunicationLibrary.Net
 
         public override void Send(BinaryMessageBase message)
         {
-            try
+            Console.WriteLine(Thread.CurrentThread.ManagedThreadId);
+            lock (SendMonitor)
             {
-                var buffer = MessageManager.Encode(message);
-                _communicator.Write(buffer);
-            }
-            catch (SocketException)
-            {
-                Close();
-            }
-            catch (IOException)
-            {
-                Close();
-            }
-            catch (BinaryEncodingException)
-            {
-                Console.WriteLine("BinaryEncodingException: Encode");
+                try
+                {
+                    var buffer = MessageManager.Encode(message);
+                    _communicator.Write(buffer);
+                }
+                catch (SocketException)
+                {
+                    Close();
+                }
+                catch (IOException)
+                {
+                    Close();
+                }
+                catch (BinaryEncodingException)
+                {
+                    Console.WriteLine("BinaryEncodingException: Encode");
+                }
             }
         }
 
         public override BinaryMessageBase Read()
         {
+            Console.WriteLine(Thread.CurrentThread.ManagedThreadId);
             byte[] buffer = new byte[EncodingConstants.MAX_MESSAGE_LENGTH];
             BinaryMessageBase receivedMessage = null;
 
-            try
+            lock (ReadMonitor)
             {
-                buffer = _communicator.Read();
-                receivedMessage = MessageManager.Decode(buffer);
+                try
+                {
+                    buffer = _communicator.Read();
+                    receivedMessage = MessageManager.Decode(buffer);
+                }
+                catch (SocketException)
+                {
+                    Close();
+                }
+                catch (IOException)
+                {
+                    Close();
+                }
+                catch (BinaryEncodingException)
+                {
+                    Console.WriteLine("BinaryEncodingException: Decode");
+                }                
             }
-            catch (SocketException)
-            {
-                Close();
-            }
-            catch (IOException)
-            {
-                Close();
-            }
-            catch(BinaryEncodingException)
-            {
-                Console.WriteLine("BinaryEncodingException: Decode");
-            }         
 
             return receivedMessage;
         }

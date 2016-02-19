@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using P2PCommunicationLibrary.Messages;
 using P2PCommunicationLibrary.Net;
 
 namespace P2PCommunicationLibrary.SuperPeer
 {
     class PeerMessageManager
-    {
+    {        
         private readonly SuperPeerNode _superPeerNode;
 
         public PeerMessageManager(SuperPeerNode superPeerNode)
@@ -15,7 +16,7 @@ namespace P2PCommunicationLibrary.SuperPeer
         }
 
         public void BeginProcessClientMessages()
-        {
+        {            
             _superPeerNode.GetSuperPeerClient().MessageReceivedEvent += PeerOnMessageReceivedEvent;
             _superPeerNode.GetSuperPeerClient().ListenMessages();
         }
@@ -29,9 +30,10 @@ namespace P2PCommunicationLibrary.SuperPeer
 
             if (message == null)
                 return;
-
+            
             switch (message.TypeOfMessage)
             {
+               
                 case MessageType.Request:
                     switch (((RequestMessage)message).RequestedMessageType)
                     {
@@ -50,7 +52,7 @@ namespace P2PCommunicationLibrary.SuperPeer
                     else if (_superPeerNode is SuperPeerServer)
                         new ServerMessageManager((SuperPeerServer)_superPeerNode).ServerPeerOnMessageReceivedEvent(sender, messageArgs);
                     break;
-            }
+            }          
         }
     }
 }

@@ -2,13 +2,13 @@
 {
     abstract class ClientPeerConnection
     {
-        public ClientPeer ServerPeer { get; private set; }
-        public PeerAddress PeerAddress { get; private set; }
+        public ClientPeer ClientPeer { get; private set; }
+        public PeerAddress ClientPeerAddress { get; private set; }
 
-        public ClientPeerConnection(ClientPeer serverPeer, PeerAddress peerAddress)
+        public ClientPeerConnection(ClientPeer clientPeer, PeerAddress clientPeerAddress)
         {
-            ServerPeer = serverPeer;
-            PeerAddress = peerAddress;
+            ClientPeer = clientPeer;
+            ClientPeerAddress = clientPeerAddress;
         }
 
         public abstract void ProcessConnection();

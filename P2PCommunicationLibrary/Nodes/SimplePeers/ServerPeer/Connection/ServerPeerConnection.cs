@@ -6,13 +6,12 @@ namespace P2PCommunicationLibrary.SimplePeers.ServerPeer
     {
         private static readonly object newClientEventMonitor = new object();
 
-        public ServerPeer ServerPeer { get; private set; }
-        public PeerAddress PeerAddress { get; private set; }
+        public ServerPeer ServerPeer { get; private set; }        
 
-        public ServerPeerConnection(ServerPeer serverPeer, PeerAddress peerAddress)
+        public ServerPeerConnection(ServerPeer serverPeer)
         {
             ServerPeer = serverPeer;
-            PeerAddress = peerAddress;
+         
         }
 
         public abstract void ProcessConnection();

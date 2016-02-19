@@ -18,8 +18,9 @@ namespace P2PCommunicationLibrary.SuperPeer
 
             switch (message.TypeOfMessage)
             {
-                case MessageType.ConnectAsServer:
-                    InitConnectionAsServer(((PeerAddressMessage) messageArgs.Message).PeerAddress);
+                case MessageType.ConnectAsServer:                   
+                    InitConnectionAsServer(((PeerAddressMessage) messageArgs.Message).PeerAddress);      
+                    _superPeerServer.GetClientInfo().Client.StopListeningMessages();         
                     break;
             }
         }

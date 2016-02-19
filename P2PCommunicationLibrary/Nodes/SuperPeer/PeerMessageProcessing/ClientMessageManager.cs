@@ -63,7 +63,7 @@ namespace P2PCommunicationLibrary.SuperPeer
         private void ProcessConnectionBetweenClients(ConnectionPair connectionPair)
         {
             Console.WriteLine("Hello from process connection");
-            connectionPair.ProcessConnection();
+            connectionPair.ProcessConnection();           
         }
     }
 }

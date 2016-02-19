@@ -18,9 +18,9 @@ namespace Test
         static void Main(string[] args)
         {
             IPEndPoint superPeerEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8090);
-            IPEndPoint serverPeerEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.2"), 8091);
+            int port = 8091;
 
-            ServerPeer server = new ServerPeer(superPeerEndPoint, serverPeerEndPoint);           
+            ServerPeer server = new ServerPeer(superPeerEndPoint, port);           
             server.Run();
 
             ClientPeer client = new ClientPeer(superPeerEndPoint);

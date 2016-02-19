@@ -14,6 +14,7 @@
         Ping = 4,
 
         TextMessage = 101,
+        IntegerMessage = 102,
 
         PeerAddress = 111,     
         ClientPeerAddress = 112,
@@ -24,8 +25,10 @@
         ConnectAsServer = 124,
 
         TcpConnection = 151, 
-        TcpConnectionAllowed = 152,       
+        TcpConnectionAllowed = 152, 
+        
+        ConnectionPort = 155,      
 
-        CloseConnection = 250
+        CloseConnection = 250,        
     }
 }

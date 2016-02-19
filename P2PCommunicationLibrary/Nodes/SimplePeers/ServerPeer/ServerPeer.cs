@@ -1,15 +1,17 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Threading.Tasks;
 using P2PCommunicationLibrary.Messages;
 using P2PCommunicationLibrary.Net;
-using P2PCommunicationLibrary.SimplePeers.ServerPeer.ServerInstances;
 
 namespace P2PCommunicationLibrary.SimplePeers.ServerPeer
 {
     public class ServerPeer
     {        
         internal Peer Peer { get; }
-        public IPEndPoint ServerPeerEndPoint { get; private set; }
+        public int ServerPeerPort { get; private set; }
+
+        private Lazy<ServerTCP> _lazyTcpServer;
 
         event ClientConnectedToServerPeerEventHandler clientConnectedToServerPeerEvent;
 
@@ -17,43 +19,57 @@ namespace P2PCommunicationLibrary.SimplePeers.ServerPeer
         {
             get { return Peer.Encryptor; }
             set { Peer.Encryptor = value; }
-        }   
+        }
+
+        private ServerPeer()
+        {
+            InitLazyTcpServer();
+        }
+
+        private void InitLazyTcpServer()
+        {
+            _lazyTcpServer = new Lazy<ServerTCP>(() =>
+            {
+                MessageManager manager = new MessageManager(Encryptor);
+                IPAddress ipAddress = GetPeerAddress().PrivateEndPoint.Address;
+                int port = ServerPeerPort;
+
+                var serverTcp = new ServerTCP(ipAddress, port, manager);
+
+                Task.Factory.StartNew(() => serverTcp.Listen());
+                return serverTcp;
+            });
+        }
 
         public ServerPeer(IPEndPoint superPeerEndPoint)
+            : this()
         {            
             Peer = new Peer(superPeerEndPoint);            
         }        
 
         public ServerPeer(IPEndPoint superPeerEndPoint, IEncryptor encryptor)
+            : this()
         {
             Peer = new Peer(superPeerEndPoint, encryptor);
         }
 
-        public ServerPeer(IPEndPoint superPeerEndPoint, IPEndPoint serverPeerEndPoint)
+        public ServerPeer(IPEndPoint superPeerEndPoint, int serverPeerPort)
             : this(superPeerEndPoint)
         {
-            ServerPeerEndPoint = serverPeerEndPoint;
+            ServerPeerPort = serverPeerPort;
         }
 
-        public ServerPeer(IPEndPoint superPeerEndPoint, IPEndPoint serverPeerEndPoint, IEncryptor encryptor)
+        public ServerPeer(IPEndPoint superPeerEndPoint, int serverPeerPort, IEncryptor encryptor)
             : this(superPeerEndPoint, encryptor)
         {
-            ServerPeerEndPoint = serverPeerEndPoint;
+            ServerPeerPort = serverPeerPort;
         }
-
+        
         public void Run()
         {
             Peer.Run(ClientType.Server);
-
-            ProcessSuperPeerMessages();
-            SetServerInstancesInitData();
-        }
-
-        private void SetServerInstancesInitData()
-        {
-            TcpServerSingleton.SetEncryptor(Encryptor);
-            TcpServerSingleton.SetServerEndPoint(ServerPeerEndPoint);
-        }
+            ProcessSuperPeerMessages();           
+        }       
 
         private void ProcessSuperPeerMessages()
         {
@@ -61,10 +77,27 @@ namespace P2PCommunicationLibrary.SimplePeers.ServerPeer
             Task.Factory.StartNew(() => Peer.StartListenMessagesFromSuperPeer());
         }
 
+        private void ProcessSuperPeerMessages(IClient client, MessageEventArgs messageEventArgs)
+        {
+            RequestMessage requestMessage = (RequestMessage)messageEventArgs.Message;
+
+            switch (requestMessage.RequestedMessageType)
+            {
+                case MessageType.TcpConnection:
+                    ServerPeerConnection serverPeerConnection = new TcpServerPeerConnection(this);
+                    serverPeerConnection.ProcessConnection();
+                    break;
+            }
+        }
+
         public void Close()
         {
             Peer.StopListenMessagesFromSuperPeer();
             Peer.Close();
+
+            if (_lazyTcpServer.IsValueCreated)            
+                _lazyTcpServer.Value.Close();
+            
         }
 
         public PeerAddress GetPeerAddress()
@@ -77,18 +110,10 @@ namespace P2PCommunicationLibrary.SimplePeers.ServerPeer
             var connectAsServerMessage = new PeerAddressMessage(peerAddress, MessageType.ConnectAsServer);
             Peer.SendToSuperPeer(connectAsServerMessage);
         }
-
-        private void ProcessSuperPeerMessages(IClient client, MessageEventArgs messageEventArgs)
-        {                      
-            RequestMessage requestMessage = (RequestMessage)messageEventArgs.Message;          
-              
-            switch (requestMessage.RequestedMessageType)
-            {
-                case MessageType.TcpConnection:
-                    ServerPeerConnection serverPeerConnection = new TcpServerPeerConnection(this, GetPeerAddress());
-                    serverPeerConnection.ProcessConnection();
-                    break;
-            }             
+        
+        internal ServerTCP GetTcpServerInstance()
+        {            
+            return _lazyTcpServer.Value;
         }
     }
 }

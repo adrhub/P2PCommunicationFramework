@@ -12,7 +12,9 @@ namespace P2PCommunicationLibrary.Net
         public event MessageReceivedEventHandler MessageReceivedEvent;
 
         #region Private members
-        private readonly object _socketMonitor = new object();
+        protected readonly object SocketMonitor = new object();
+        protected readonly object SendMonitor = new object();
+        protected readonly object ReadMonitor = new object();
         #endregion
 
         #region Properties
@@ -45,7 +47,7 @@ namespace P2PCommunicationLibrary.Net
 
         public void ListenMessages()
         {
-            lock (_socketMonitor)
+            lock (SocketMonitor)
             {
                 IsListeningMessages = true;
 
@@ -53,6 +55,7 @@ namespace P2PCommunicationLibrary.Net
                 {
                     BinaryMessageBase receivedMessage = Read();
                     MessageReceivedEvent(this, new MessageEventArgs(receivedMessage));
+                    Console.WriteLine("read again");
 
                 } while (IsListeningMessages);
             }
@@ -61,17 +64,14 @@ namespace P2PCommunicationLibrary.Net
         public void StopListeningMessages()
         {
             if (IsListeningMessages)
-            {
-                lock (_socketMonitor)
-                {                    
-                    IsListeningMessages = false;
-                }
+            {                      
+                IsListeningMessages = false;               
             }
         }
 
         public void Close()
         {
-            lock (_socketMonitor)
+            lock (SocketMonitor)
             {
                 try
                 {

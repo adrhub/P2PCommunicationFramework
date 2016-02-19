@@ -5,7 +5,7 @@ using P2PCommunicationLibrary.Net;
 namespace P2PCommunicationLibrary.SuperPeer
 {
     class PeerConnectionManager
-    {
+    {      
         private readonly IClient _client;
         private ClientInfo _clientInfo;
 
@@ -26,7 +26,7 @@ namespace P2PCommunicationLibrary.SuperPeer
         }
 
         public void BeginProcessClientConnection()
-        {       
+        {          
             if (!InitClientConnection())
                 return;                    
 

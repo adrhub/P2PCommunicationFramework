@@ -67,7 +67,7 @@ namespace P2PCommunicationLibrary.SimplePeers
 
                 //Read confirmation message
                 _superPeerClient.Read();
-                RunSendPingMessageTask();
+               // RunSendPingMessageTask();
             }
             catch (SocketException se)
             {
