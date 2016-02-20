@@ -4,9 +4,9 @@ using P2PCommunicationLibrary.Messages;
 
 namespace P2PCommunicationLibrary.Net
 {
-    class ClientUDP : ClientBase
+    class ClientUdp : ClientBase
     {
-        public ClientUDP(Socket clientSocket, IPEndPoint connectionIpEndPoint, MessageManager messageManager)
+        public ClientUdp(Socket clientSocket, IPEndPoint connectionIpEndPoint, MessageManager messageManager)
             : base(connectionIpEndPoint, messageManager)
         {
             ClientSocket = clientSocket;
@@ -14,7 +14,7 @@ namespace P2PCommunicationLibrary.Net
             RemoteEndPoint = (IPEndPoint)ClientSocket.RemoteEndPoint;
         }
 
-        public ClientUDP(IPEndPoint connectionIpEndPoint, MessageManager messageManager)
+        public ClientUdp(IPEndPoint connectionIpEndPoint, MessageManager messageManager)
             : base(connectionIpEndPoint, messageManager)
         {
             ClientSocket = InitUdpSocketConnection();

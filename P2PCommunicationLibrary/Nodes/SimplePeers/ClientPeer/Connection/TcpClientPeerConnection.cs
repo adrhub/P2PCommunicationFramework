@@ -18,7 +18,7 @@ namespace P2PCommunicationLibrary.SimplePeers.ClientPeer
             MessageManager messageManager = new MessageManager (ClientPeer.Encryptor);
             IPEndPoint connectionIpEndPoint = serverPrivateIpEndPoint.PeerAddress.PrivateEndPoint;
 
-            var client = new ClientTCP(connectionIpEndPoint, messageManager);
+            var client = new ClientTcp(connectionIpEndPoint, messageManager);
         }
 
         public override void Close()

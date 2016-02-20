@@ -5,7 +5,7 @@ using P2PCommunicationLibrary.Messages;
 
 namespace P2PCommunicationLibrary.Net
 {
-    class ServerTCP : IServer
+    class ServerTcp : IServer
     {
         public event ClientConnectedEventHandler NewClientEvent;
 
@@ -24,7 +24,7 @@ namespace P2PCommunicationLibrary.Net
         #endregion
 
         #region Constructors
-        public ServerTCP(IPAddress address, int port, MessageManager messageManager)
+        public ServerTcp(IPAddress address, int port, MessageManager messageManager)
         {
             Port = port;
             Address = address;
@@ -41,6 +41,7 @@ namespace P2PCommunicationLibrary.Net
                 {
                     _listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                     _listener.Bind(new IPEndPoint(Address, Port));
+                    Port = ((IPEndPoint) _listener.LocalEndPoint).Port;
                     // fire up the Server
                     _listener.Listen(_backlog);
 
@@ -58,7 +59,7 @@ namespace P2PCommunicationLibrary.Net
                     Trace.WriteLine("Connected to new Client");
 
                     // queue a request to take care of the Client
-                    ProcessClient(new ClientTCP(newClient, _messageManager));
+                    ProcessClient(new ClientTcp(newClient, _messageManager));
                     //ThreadPool.QueueUserWorkItem(new WaitCallback(ProcessClient), newClient);
                 }
                 while (IsListening);

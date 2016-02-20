@@ -7,18 +7,18 @@ using P2PCommunicationLibrary.Messages;
 
 namespace P2PCommunicationLibrary.Net
 {
-    class ClientTCP : ClientBase
+    class ClientTcp : ClientBase
     {        
         private ICommunicator _communicator;
 
-        public ClientTCP(Socket clientSocket, MessageManager messageManager)
+        public ClientTcp(Socket clientSocket, MessageManager messageManager)
             : base(messageManager)
         {
             ClientSocket = clientSocket;         
             InitProperties();
         }
 
-        public ClientTCP(IPEndPoint connectionIpEndPoint, MessageManager messageManager)
+        public ClientTcp(IPEndPoint connectionIpEndPoint, MessageManager messageManager)
             : base(connectionIpEndPoint, messageManager)
         {
             ClientSocket = InitTcpSocketConnection();

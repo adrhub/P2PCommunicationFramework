@@ -8,10 +8,10 @@ namespace P2PCommunicationLibrary.SimplePeers.ServerPeer
 {
     public class ServerPeer
     {        
-        internal Peer Peer { get; }
+        internal Peer Peer { get; private set; }
         public int ServerPeerPort { get; private set; }
 
-        private Lazy<ServerTCP> _lazyTcpServer;
+        private Lazy<ServerTcp> _lazyTcpServer;
 
         event ClientConnectedToServerPeerEventHandler clientConnectedToServerPeerEvent;
 
@@ -28,13 +28,13 @@ namespace P2PCommunicationLibrary.SimplePeers.ServerPeer
 
         private void InitLazyTcpServer()
         {
-            _lazyTcpServer = new Lazy<ServerTCP>(() =>
+            _lazyTcpServer = new Lazy<ServerTcp>(() =>
             {
                 MessageManager manager = new MessageManager(Encryptor);
                 IPAddress ipAddress = GetPeerAddress().PrivateEndPoint.Address;
                 int port = ServerPeerPort;
 
-                var serverTcp = new ServerTCP(ipAddress, port, manager);
+                var serverTcp = new ServerTcp(ipAddress, port, manager);
 
                 Task.Factory.StartNew(() => serverTcp.Listen());
                 return serverTcp;
@@ -111,7 +111,7 @@ namespace P2PCommunicationLibrary.SimplePeers.ServerPeer
             Peer.SendToSuperPeer(connectAsServerMessage);
         }
         
-        internal ServerTCP GetTcpServerInstance()
+        internal ServerTcp GetTcpServerInstance()
         {            
             return _lazyTcpServer.Value;
         }

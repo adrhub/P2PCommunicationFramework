@@ -6,7 +6,7 @@ namespace P2PCommunicationLibrary.SimplePeers.ClientPeer
 {
     public class ClientPeer
     {
-        internal Peer Peer { get; }
+        internal Peer Peer { get; private set; }
 
         public IEncryptor Encryptor
         {

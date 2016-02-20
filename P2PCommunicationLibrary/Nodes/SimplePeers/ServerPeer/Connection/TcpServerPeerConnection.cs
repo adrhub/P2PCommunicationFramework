@@ -8,7 +8,7 @@ namespace P2PCommunicationLibrary.SimplePeers.ServerPeer
 {
     class TcpServerPeerConnection : ServerPeerConnection
     {
-        private ServerTCP _server;
+        private ServerTcp _serverTcp;
 
         public TcpServerPeerConnection(ServerPeer serverPeer)
             : base(serverPeer)
@@ -17,7 +17,7 @@ namespace P2PCommunicationLibrary.SimplePeers.ServerPeer
 
         public override void ProcessConnection()
         {            
-            _server = ServerPeer.GetTcpServerInstance();
+            _serverTcp = ServerPeer.GetTcpServerInstance();
             AllowClientToConnect();
             var serverPrivateIpEndPoint = new IPEndPoint(ServerPeer.GetPeerAddress().PrivateEndPoint.Address, ServerPeer.ServerPeerPort);
 
@@ -27,10 +27,10 @@ namespace P2PCommunicationLibrary.SimplePeers.ServerPeer
 
         private void AllowClientToConnect()
         {
-            AddMethodToNewClientEvent(_server, ServerOnNewClientEvent);
+            AddMethodToNewClientEvent(_serverTcp, ServerOnNewClientEvent);
 
             PeriodicTask eventCleaner = new PeriodicTask(
-                () => RemoveMethodFromNewClientEvent(_server, ServerOnNewClientEvent),
+                () => RemoveMethodFromNewClientEvent(_serverTcp, ServerOnNewClientEvent),
                 TimeSpan.FromSeconds(0),
                 TimeSpan.FromSeconds(60),
                 CancellationToken.None);
@@ -46,7 +46,7 @@ namespace P2PCommunicationLibrary.SimplePeers.ServerPeer
                   & newClient.RemoteEndPoint.Equals(ServerPeer.GetPeerAddress().PublicEndPoint)))
                 return;
 
-            RemoveMethodFromNewClientEvent(_server, ServerOnNewClientEvent);
+            RemoveMethodFromNewClientEvent(_serverTcp, ServerOnNewClientEvent);
         }        
 
         public override void Close()

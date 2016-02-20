@@ -78,8 +78,6 @@ namespace P2PCommunicationLibrary.SuperPeer
                 return ((Client != null ? Client.GetSuperPeerClient().LocalEndPoint.ToString().GetHashCode() : 0)*397) 
                     ^ (Server != null ? Server.GetSuperPeerClient().LocalEndPoint.ToString().GetHashCode() : 0);
             }
-        }
-
-        
+        }        
     }
 }

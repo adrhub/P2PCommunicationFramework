@@ -45,15 +45,12 @@ namespace P2PCommunicationLibrary.SuperPeer
         public void Run()
         {
             IsRunning = true;
-
-            if (Encryptor != null)
-                _messageManager = new MessageManager(Encryptor);
-            else            
-                _messageManager = new MessageManager();            
+         
+            _messageManager = new MessageManager(Encryptor);                     
 
             try
             {
-                _server = new ServerTCP(Address, Port, _messageManager);
+                _server = new ServerTcp(Address, Port, _messageManager);
                 _server.NewClientEvent += ClientConnected_EventHandler;
                 RunConnectionCheckTask();
                 _server.Listen();
@@ -74,7 +71,7 @@ namespace P2PCommunicationLibrary.SuperPeer
                 CancellationToken.None);
 
             periodicTask.DoPeriodicWorkAsync();
-        }
+        }       
 
         public void StopRunning()
         {
@@ -90,10 +87,7 @@ namespace P2PCommunicationLibrary.SuperPeer
         /// </summary>       
         private void ClientConnected_EventHandler(IServer sender, IClient client)
         {
-            Task.Factory.StartNew(() =>
-            {                                
-                new PeerConnectionManager(client).BeginProcessClientConnection();                
-            });
+            Task.Factory.StartNew(() => new PeerConnectionManager(client).BeginProcessClientConnection());
         }
         
     }

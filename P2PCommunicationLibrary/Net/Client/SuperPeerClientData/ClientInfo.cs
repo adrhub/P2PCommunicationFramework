@@ -6,14 +6,15 @@ namespace P2PCommunicationLibrary.Net
     {
         public IClient Client { get; private set; }
         public DateTime LastPingMesssageDateTime { get; set; }
-
+        public Token Token { get; private set; }
         private DateTime _connectionDateTime;
         private PeerAddress _peerAddress;
-        private ClientType _clientType;
+        private ClientType _clientType;        
 
         public ClientInfo(IClient client)
         {
             Client = client;
+            Token = Token.GenerateNew();
         }
 
         public DateTime ConnectionDateTime()
@@ -47,6 +48,6 @@ namespace P2PCommunicationLibrary.Net
         {
             _clientType = clientType;
             return this;
-        }       
+        }        
     }
 }

@@ -4,6 +4,7 @@ namespace P2PCommunicationLibrary.SuperPeer
 {
     abstract class Connection
     {
+        public static ServerTcp ServerTcp;
         public SuperPeerServer Server { get; set; }
         public SuperPeerClient Client { get; set; }
 

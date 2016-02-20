@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using System.Threading.Tasks;
 using P2PCommunicationLibrary.Messages;
 using P2PCommunicationLibrary.Net;
 
@@ -80,7 +79,7 @@ namespace P2PCommunicationLibrary.SimplePeers
 
         private void InitSuperPeerConnection()
         {
-            _superPeerClient = new ClientTCP(_superPeerEndPoint, _messageManager);
+            _superPeerClient = new ClientTcp(_superPeerEndPoint, _messageManager);
             _superPeerClient.Send(new ConnectionMessage());
         }
 
