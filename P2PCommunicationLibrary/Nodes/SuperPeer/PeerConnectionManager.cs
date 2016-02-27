@@ -5,12 +5,14 @@ using P2PCommunicationLibrary.Net;
 namespace P2PCommunicationLibrary.SuperPeer
 {
     class PeerConnectionManager
-    {      
+    {
+        private SuperPeer _superPeer;
         private readonly IClient _client;
-        private ClientInfo _clientInfo;
+        private ClientInfo _clientInfo;       
 
-        public PeerConnectionManager(IClient client)
-        {
+        public PeerConnectionManager(SuperPeer superPeer, IClient client)
+        {            
+            _superPeer = superPeer;
             _client = client;
             _clientInfo = new ClientInfo(client); 
                                   
@@ -62,9 +64,9 @@ namespace P2PCommunicationLibrary.SuperPeer
             SuperPeerNode superPeerNode;
 
             if (clientType == ClientType.Client)            
-                superPeerNode = new SuperPeerClient(_client);            
+                superPeerNode = new SuperPeerClient(_superPeer, _client);            
             else
-                superPeerNode = new SuperPeerServer(_client);
+                superPeerNode = new SuperPeerServer(_superPeer, _client);
 
             return superPeerNode;
         }

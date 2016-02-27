@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using P2PCommunicationLibrary.Messages;
@@ -12,6 +13,7 @@ namespace P2PCommunicationLibrary.Net
         #region Private Members
         private Socket _listener;
         private MessageManager _messageManager;
+        private bool _binded = false;
 
         private int _backlog = 32;
         private readonly object _syncRoot = new object();
@@ -39,9 +41,8 @@ namespace P2PCommunicationLibrary.Net
             {
                 lock (_syncRoot)
                 {
-                    _listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                    _listener.Bind(new IPEndPoint(Address, Port));
-                    Port = ((IPEndPoint) _listener.LocalEndPoint).Port;
+                    if(!_binded)
+                        Bind();
                     // fire up the Server
                     _listener.Listen(_backlog);
 
@@ -71,6 +72,28 @@ namespace P2PCommunicationLibrary.Net
             finally
             {
                 // shut it down
+                StopListening();
+            }
+        }
+
+        public void Bind()
+        {
+            try
+            {
+                lock (_syncRoot)
+                {
+                    _listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                    _listener.Bind(new IPEndPoint(Address, Port));
+                    Port = ((IPEndPoint) _listener.LocalEndPoint).Port;
+                    _binded = true;
+                }
+            }
+            catch (SocketException se)
+            {
+                Trace.WriteLine("SocketException: " + se.ErrorCode + " " + se.Message);                               
+            }
+            finally
+            {
                 StopListening();
             }
         }

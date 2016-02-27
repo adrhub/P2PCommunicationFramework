@@ -54,8 +54,9 @@ namespace P2PCommunicationLibrary.Net
                 do
                 {
                     BinaryMessageBase receivedMessage = Read();
-                    MessageReceivedEvent(this, new MessageEventArgs(receivedMessage));
-                    Console.WriteLine("read again");
+
+                    if (MessageReceivedEvent != null)
+                        MessageReceivedEvent(this, new MessageEventArgs(receivedMessage));                   
 
                 } while (IsListeningMessages);
             }

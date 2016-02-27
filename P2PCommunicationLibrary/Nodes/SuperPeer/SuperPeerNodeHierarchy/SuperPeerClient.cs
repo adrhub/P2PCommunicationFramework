@@ -6,8 +6,8 @@ namespace P2PCommunicationLibrary.SuperPeer
     {        
         public SuperPeerServer SuperPeerServer { get; set; }
 
-        public SuperPeerClient(IClient peerClient)
-            : base(peerClient)
+        public SuperPeerClient(SuperPeer superPeer, IClient peerClient)
+            : base(superPeer, peerClient)
         {           
         }               
     }

@@ -22,6 +22,10 @@
                     return new PeerAddressMessage(encoding);
                 case MessageType.ConnectAsServer:
                     return new PeerAddressMessage(encoding);
+                case MessageType.IntegerMessage:
+                    return new IntegerMessage(encoding);
+                case MessageType.ConnectionPort:
+                    return new IntegerMessage(encoding);
                 default:
                     return null;
             }

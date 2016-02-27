@@ -11,6 +11,7 @@ namespace P2PCommunicationLibrary.Net
 
         bool IsListening { get; }
         void Listen();
-        void StopListening(); 
+        void StopListening();
+        void Bind();
     }
 }

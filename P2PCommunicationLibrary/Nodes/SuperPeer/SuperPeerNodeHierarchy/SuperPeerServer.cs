@@ -9,11 +9,11 @@ namespace P2PCommunicationLibrary.SuperPeer
         private readonly object _monitor = new object();       
         private List<SuperPeerClient> connectedClients = new List<SuperPeerClient>();
         private List<PeerAddress> allowedConnections = new List<PeerAddress>();
-       
-        public SuperPeerServer(IClient peerClient)
-            : base(peerClient)
+
+        public SuperPeerServer(SuperPeer superPeer, IClient peerClient)
+            : base(superPeer, peerClient)
         {            
-        }       
+        }
 
         public List<SuperPeerClient> GetConnectedClients()
         {

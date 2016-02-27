@@ -32,6 +32,11 @@ namespace P2PCommunicationLibrary.SuperPeer
             }
         }
 
+        internal MessageManager GetMessageManager()
+        {
+            return _messageManager;
+        }
+
         #endregion
 
         public SuperPeer(IPAddress address, int port)
@@ -87,7 +92,7 @@ namespace P2PCommunicationLibrary.SuperPeer
         /// </summary>       
         private void ClientConnected_EventHandler(IServer sender, IClient client)
         {
-            Task.Factory.StartNew(() => new PeerConnectionManager(client).BeginProcessClientConnection());
+            Task.Factory.StartNew(() => new PeerConnectionManager(this, client).BeginProcessClientConnection());
         }
         
     }

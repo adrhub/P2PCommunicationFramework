@@ -4,10 +4,12 @@ namespace P2PCommunicationLibrary.SuperPeer
 {
     abstract class SuperPeerNode
     {
+        private readonly SuperPeer _superPeer;
         private readonly IClient _peerClient;
 
-        protected SuperPeerNode(IClient peerClient)
+        protected SuperPeerNode(SuperPeer superPeer, IClient peerClient)
         {
+            _superPeer = superPeer;
             _peerClient = peerClient;
         }
 
@@ -19,6 +21,11 @@ namespace P2PCommunicationLibrary.SuperPeer
         public ClientInfo GetClientInfo()
         {
             return ClientRepository.GetClientInfo(_peerClient);
+        }
+
+        public SuperPeer GetSuperPeer()
+        {
+            return _superPeer;
         }
     }
 }

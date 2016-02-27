@@ -12,12 +12,14 @@ namespace P2PCommunicationLibrary.SimplePeers
     class Peer
     {
         private IClient _superPeerClient;
-        private IPEndPoint _superPeerEndPoint;
+        
         private IEncryptor _encryptor;
-        private MessageManager _messageManager;
 
+        public MessageManager MessageManager { get; private set; }
         public PeerAddress PeerAddress{ get; private set; }
         public bool IsRunning { get; private set; }
+        public IPEndPoint SuperPeerEndPoint { get; private set; }
+
         public IEncryptor Encryptor
         {
             get { return _encryptor; }
@@ -33,22 +35,22 @@ namespace P2PCommunicationLibrary.SimplePeers
         public Peer(IPEndPoint superPeerEndPoint)
         {                                  
             InitMessageManager();
-            _superPeerEndPoint = superPeerEndPoint;
+            SuperPeerEndPoint = superPeerEndPoint;
         }
 
         public Peer(IPEndPoint superPeerEndPoint, IEncryptor encryptor)
         {
             Encryptor = encryptor;
             InitMessageManager();
-            _superPeerEndPoint = superPeerEndPoint;
+            SuperPeerEndPoint = superPeerEndPoint;
         }
 
         private void InitMessageManager()
         {
             if (Encryptor != null)
-                _messageManager = new MessageManager(Encryptor);
+                MessageManager = new MessageManager(Encryptor);
             else
-                _messageManager = new MessageManager();
+                MessageManager = new MessageManager();
         }
 
         /// <summary>
@@ -79,7 +81,7 @@ namespace P2PCommunicationLibrary.SimplePeers
 
         private void InitSuperPeerConnection()
         {
-            _superPeerClient = new ClientTcp(_superPeerEndPoint, _messageManager);
+            _superPeerClient = new ClientTcp(SuperPeerEndPoint, MessageManager);
             _superPeerClient.Send(new ConnectionMessage());
         }
 
