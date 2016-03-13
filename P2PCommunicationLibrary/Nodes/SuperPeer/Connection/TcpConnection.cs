@@ -20,42 +20,30 @@ namespace P2PCommunicationLibrary.SuperPeer
             IClient client = Client.GetSuperPeerClient();            
                         
             server.Send(new RequestMessage(MessageType.TcpConnection));
-            RunConnectionTcpServer();
+            PeerAddressMessage serverConnectionAddress = (PeerAddressMessage)server.Read();
+            client.Send(new RequestMessage(MessageType.TcpConnection));
+            client.Send(serverConnectionAddress);
 
-            server.Send(new IntegerMessage(_server.Port, MessageType.ConnectionPort));
+        }
 
-           //new thread
-
-//           // string clientToken = Client.GetClientInfo().Token.Key;
-//            //server.Send(new TextMessage(clientToken));
+//        private void RunConnectionTcpServer()
+//        {
+//            
+//            IPAddress address = Client.GetSuperPeer().Address;
+//            MessageManager messageManager = Client.GetSuperPeer().GetMessageManager();
+//            _server = new ServerTcp(address, 0, messageManager);
+//            _server.NewClientEvent += ServerOnNewClientEvent;
+//            _server.Bind();
 //
-//            //read confirmation message, check if server is ready; read port
-//            var serverPrivateIpEndPoint = (PeerAddressMessage)server.Read(); // 111
+//            Task.Factory.StartNew(() =>
+//            {
+//                _server.Listen();
+//            });
+//        }
 //
-//            //say to client that he can connect to the server; send port
-//            client.Send(serverPrivateIpEndPoint);
-//            //read confirmation message, check if client connected to the server
-//            client.Read();
-        }
-
-        private void RunConnectionTcpServer()
-        {
-            
-            IPAddress address = Client.GetSuperPeer().Address;
-            MessageManager messageManager = Client.GetSuperPeer().GetMessageManager();
-            _server = new ServerTcp(address, 0, messageManager);
-            _server.NewClientEvent += ServerOnNewClientEvent;
-            _server.Bind();
-
-            Task.Factory.StartNew(() =>
-            {
-                _server.Listen();
-            });
-        }
-
-        private void ServerOnNewClientEvent(IServer sender, IClient newClient)
-        {    
-            Console.WriteLine("dasdasdasda");        
-        }
+//        private void ServerOnNewClientEvent(IServer sender, IClient newClient)
+//        {    
+//            Console.WriteLine("dasdasdasda");        
+//        }
     }
 }

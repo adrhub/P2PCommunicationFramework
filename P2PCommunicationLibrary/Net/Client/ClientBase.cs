@@ -22,6 +22,7 @@ namespace P2PCommunicationLibrary.Net
         protected MessageManager MessageManager { get; private set; }
         protected IPEndPoint ConnectionIpEndPoint { get; private set; }
 
+
         public bool IsListeningMessages { get; private set; }
 
         public IPEndPoint LocalEndPoint { get; protected set; }
@@ -45,6 +46,20 @@ namespace P2PCommunicationLibrary.Net
 
         public abstract BinaryMessageBase Read();
 
+        public void ListenOneMessage()
+        {
+            if (IsListeningMessages)
+                return;
+
+            lock (SocketMonitor)
+            {
+                BinaryMessageBase receivedMessage = Read();
+
+                if (MessageReceivedEvent != null)
+                    MessageReceivedEvent(this, new MessageEventArgs(receivedMessage));
+            }
+        }
+
         public void ListenMessages()
         {
             lock (SocketMonitor)
@@ -56,7 +71,7 @@ namespace P2PCommunicationLibrary.Net
                     BinaryMessageBase receivedMessage = Read();
 
                     if (MessageReceivedEvent != null)
-                        MessageReceivedEvent(this, new MessageEventArgs(receivedMessage));                   
+                        MessageReceivedEvent(this, new MessageEventArgs(receivedMessage));
 
                 } while (IsListeningMessages);
             }

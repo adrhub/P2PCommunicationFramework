@@ -32,8 +32,7 @@ namespace P2PCommunicationLibrary.SuperPeer
                 return;
             
             switch (message.TypeOfMessage)
-            {
-               
+            {               
                 case MessageType.Request:
                     switch (((RequestMessage)message).RequestedMessageType)
                     {

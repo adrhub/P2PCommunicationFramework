@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using P2PCommunicationLibrary.Messages;
 using P2PCommunicationLibrary.Net;
 
@@ -13,17 +14,11 @@ namespace P2PCommunicationLibrary.SimplePeers.ClientPeer
 
         public override void ProcessConnection()
         {
-            var serverPrivateIpEndPoint = (PeerAddressMessage) ClientPeer.Peer.ReadFromSuperPeer();
+            PeerAddressMessage peerAddressMessage = (PeerAddressMessage) ClientPeer.Peer.ReadFromSuperPeer();
 
-            MessageManager messageManager = new MessageManager (ClientPeer.Encryptor);
-            IPEndPoint connectionIpEndPoint = serverPrivateIpEndPoint.PeerAddress.PrivateEndPoint;
-
-            var client = new ClientTcp(connectionIpEndPoint, messageManager);
-        }
-
-        public override void Close()
-        {
-            throw new System.NotImplementedException();
-        }
+            MessageManager messageManager = ClientPeer.Peer.MessageManager;
+            IPEndPoint connectionIpEndPoint = peerAddressMessage.PeerAddress.PrivateEndPoint;
+            Client = new ClientTcp(connectionIpEndPoint, messageManager);            
+        }        
     }
 }

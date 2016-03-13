@@ -18,6 +18,7 @@ namespace P2PCommunicationLibrary.Net
         Socket ClientSocket { get; }
 
         void ListenMessages();
+        void ListenOneMessage();
         bool IsListeningMessages { get; }
         void StopListeningMessages();     
     }

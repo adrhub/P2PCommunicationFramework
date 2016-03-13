@@ -9,8 +9,7 @@ namespace P2PCommunicationLibrary.SimplePeers.ServerPeer
 {
     class TcpServerPeerConnection : ServerPeerConnection
     {
-        private ServerTcp _server;
-        private ClientTcp _superPeerClientTcp;
+        private ServerTcp _server; 
 
         public TcpServerPeerConnection(ServerPeer serverPeer)
             : base(serverPeer)
@@ -18,53 +17,34 @@ namespace P2PCommunicationLibrary.SimplePeers.ServerPeer
         }
 
         public override void ProcessConnection()
-        {
-            IntegerMessage integerMessage = ((IntegerMessage)ServerPeer.Peer.ReadFromSuperPeer());
-            int superPeerConnectionPort = integerMessage.Integer;
-            ProcessCommunicationOnNewThread(superPeerConnectionPort);
-
-
-            //new thread            
-
-
-//            var serverPrivateIpEndPoint = new IPEndPoint(ServerPeer.GetPeerAddress().PrivateEndPoint.Address, ServerPeer.ServerPeerPort);
-//
-//            ServerPeer.Peer.SendToSuperPeer(new PeerAddressMessage(new PeerAddress {PrivateEndPoint = serverPrivateIpEndPoint}));           
-//            Console.WriteLine("...message sent...");
+        {                       
+            RunConnectionTcpServer();
+            ServerPeer.Peer.SendToSuperPeer(
+                new PeerAddressMessage(
+                new PeerAddress(
+                    new IPEndPoint(ServerPeer.Peer.PeerAddress.PrivateEndPoint.Address, _server.Port),
+                    null)));
         }
 
-        private void ProcessCommunicationOnNewThread(int superPeerConnectionPort)
-        {
+        private void RunConnectionTcpServer()
+        {                    
+            IPAddress address = ServerPeer.Peer.PeerAddress.PrivateEndPoint.Address;
+            MessageManager messageManager = ServerPeer.Peer.MessageManager;
+            _server = new ServerTcp(address, 0, messageManager);
+            _server.NewClientEvent += ServerOnNewClientEvent;
+            _server.Bind();
+        
             Task.Factory.StartNew(() =>
             {
-                RunConnectionTcpClient(superPeerConnectionPort);
-
+                _server.Listen();
             });
         }
-
-        private void RunConnectionTcpClient(int superPeerConnectionPort)
+        
+        private void ServerOnNewClientEvent(IServer sender, IClient newClient)
         {
-
-            IPEndPoint superPeerConnEndPoint = new IPEndPoint(ServerPeer.Peer.SuperPeerEndPoint.Address,
-                superPeerConnectionPort);
-            _superPeerClientTcp = new ClientTcp(superPeerConnEndPoint, ServerPeer.Peer.MessageManager);
-        }
-
-//
-//        private void ServerOnNewClientEvent(IServer sender, IClient newClient)
-//        {
-//            PeerAddressMessage peerAddressMessage = (PeerAddressMessage) newClient.Read();
-//
-//            if (!(peerAddressMessage.PeerAddress.Equals(ServerPeer.GetPeerAddress())
-//                  & newClient.RemoteEndPoint.Equals(ServerPeer.GetPeerAddress().PublicEndPoint)))
-//                return;
-//
-//            RemoveMethodFromNewClientEvent(_serverTcp, ServerOnNewClientEvent);
-//        }        
-//
-        public override void Close()
-        {
-            throw new System.NotImplementedException();
-        }
+            //TODO check if it's the expected client           
+            Client = newClient;
+            RemoveMethodFromNewClientEvent(_server, ServerOnNewClientEvent);                                         
+        }        
     }
 }

@@ -7,6 +7,7 @@ namespace P2PCommunicationLibrary.SimplePeers.ServerPeer
         private static readonly object newClientEventMonitor = new object();
 
         public ServerPeer ServerPeer { get; private set; }        
+        public IClient Client { get; protected set; }
 
         public ServerPeerConnection(ServerPeer serverPeer)
         {
@@ -14,8 +15,7 @@ namespace P2PCommunicationLibrary.SimplePeers.ServerPeer
          
         }
 
-        public abstract void ProcessConnection();
-        public abstract void Close();
+        public abstract void ProcessConnection();        
 
         protected static void AddMethodToNewClientEvent(IServer server, ClientConnectedEventHandler clientConnectedEventHandler)
         {
@@ -31,6 +31,12 @@ namespace P2PCommunicationLibrary.SimplePeers.ServerPeer
             {
                 server.NewClientEvent -= clientConnectedEventHandler;
             }            
+        }
+
+        public void Close()
+        {
+            if (Client != null)
+                Client.Close();
         }
     }
 }
