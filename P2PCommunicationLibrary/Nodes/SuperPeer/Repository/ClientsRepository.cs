@@ -27,7 +27,7 @@ namespace P2PCommunicationLibrary.SuperPeer
         public static void RemoveClient(IClient client)
         {
             lock (ClientsMonitor)
-            {
+            {                
                 Clients.Remove(client);
             }
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Net.Mail;
 using System.Threading.Tasks;
 using P2PCommunicationLibrary.Messages;
 using P2PCommunicationLibrary.Net;
@@ -10,10 +11,8 @@ namespace P2PCommunicationLibrary.SimplePeers.ServerPeer
     {        
         internal Peer Peer { get; private set; }
         public int ServerPeerPort { get; private set; }
-
-        private Lazy<ServerTcp> _lazyTcpServer;
-
-        event ClientConnectedToServerPeerEventHandler clientConnectedToServerPeerEvent;
+        private IClient _client;
+        
 
         public IEncryptor Encryptor
         {
@@ -22,24 +21,8 @@ namespace P2PCommunicationLibrary.SimplePeers.ServerPeer
         }
 
         private ServerPeer()
-        {
-            InitLazyTcpServer();
-        }
-
-        private void InitLazyTcpServer()
-        {
-            _lazyTcpServer = new Lazy<ServerTcp>(() =>
-            {
-                MessageManager manager = new MessageManager(Encryptor);
-                IPAddress ipAddress = GetPeerAddress().PrivateEndPoint.Address;
-                int port = ServerPeerPort;
-
-                var serverTcp = new ServerTcp(ipAddress, port, manager);
-
-                Task.Factory.StartNew(() => serverTcp.Listen());
-                return serverTcp;
-            });
-        }
+        {            
+        }        
 
         public ServerPeer(IPEndPoint superPeerEndPoint)
             : this()
@@ -68,36 +51,34 @@ namespace P2PCommunicationLibrary.SimplePeers.ServerPeer
         public void Run()
         {
             Peer.Run(ClientType.Server);
-            ProcessSuperPeerMessages();           
+//            ProcessSuperPeerMessages();           
         }       
 
-        private void ProcessSuperPeerMessages()
-        {
-            Peer.AddMethodToMessageReceivedEvent(ProcessSuperPeerMessages);
-            Task.Factory.StartNew(() => Peer.StartListenMessagesFromSuperPeer());
-        }
+//        private void ProcessSuperPeerMessages()
+//        {
+//            Peer.AddMethodToMessageReceivedEvent(ProcessSuperPeerMessages);
+//            Task.Factory.StartNew(() => Peer.StartListenMessagesFromSuperPeer());
+//        }
 
-        private void ProcessSuperPeerMessages(IClient client, MessageEventArgs messageEventArgs)
-        {
-            RequestMessage requestMessage = (RequestMessage)messageEventArgs.Message;
-
-            switch (requestMessage.RequestedMessageType)
-            {
-                case MessageType.TcpConnection:
-                    ServerPeerConnection serverPeerConnection = new TcpServerPeerConnection(this);
-                    serverPeerConnection.ProcessConnection();
-                    break;
-            }
-        }
+//        private void ProcessSuperPeerMessages(IClient client, MessageEventArgs messageEventArgs)
+//        {
+//            RequestMessage requestMessage = (RequestMessage)messageEventArgs.Message;
+//
+//            switch (requestMessage.RequestedMessageType)
+//            {
+//                case MessageType.TcpConnection:
+//                    ServerPeerConnection serverPeerConnection = new TcpServerPeerConnection(this);
+//                    _client = serverPeerConnection.GetConnection();
+//                    break;
+//            }
+//        }
 
         public void Close()
         {
-            Peer.StopListenMessagesFromSuperPeer();
+            if (_client != null)
+                _client.Close();
+            //Peer.StopListenMessagesFromSuperPeer();
             Peer.Close();
-
-            if (_lazyTcpServer.IsValueCreated)            
-                _lazyTcpServer.Value.Close();
-            
         }
 
         public PeerAddress GetPeerAddress()
@@ -109,11 +90,23 @@ namespace P2PCommunicationLibrary.SimplePeers.ServerPeer
         {
             var connectAsServerMessage = new PeerAddressMessage(peerAddress, MessageType.ConnectAsServer);
             Peer.SendToSuperPeer(connectAsServerMessage);
+
+            Peer.ReadFromSuperPeer();
+            ServerPeerConnection serverPeerConnection = new TcpServerPeerConnection(this);
+            _client = serverPeerConnection.GetConnection();
+
+            Peer.Close();
+            Console.WriteLine("Client connected to server");            
         }
-        
-        internal ServerTcp GetTcpServerInstance()
-        {            
-            return _lazyTcpServer.Value;
+
+        public void Send(byte[] byteArray)
+        {
+            Peer.Send(_client, byteArray);
+        }
+
+        public byte[] Read()
+        {
+            return Peer.Read(_client);
         }
     }
 }

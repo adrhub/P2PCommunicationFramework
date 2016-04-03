@@ -26,13 +26,18 @@ namespace Test
             ClientPeer client = new ClientPeer(superPeerEndPoint);
             client.Run();
 
-            server.AllowConnection(client.GetPeerAddress());  
-            Thread.Sleep(1000);          
-            client.Connect(server.GetPeerAddress());
+            //used Task.Factory.StartNew(() and sleep to simulate that this tasks are performed on different applications/machines
+            Task.Factory.StartNew(() => server.AllowConnection(client.GetPeerAddress()));         
+            Thread.Sleep(3000);    
+            Task.Factory.StartNew(() => client.Connect(server.GetPeerAddress()));
+
+            Thread.Sleep(3000);
+            server.Send(new byte[] {1,2,3,4,5});
+            Console.WriteLine(client.Read());
             
-//            client.Close();
-//            Thread.Sleep(1000);
-//            server.Close();            
+            client.Close();
+            Thread.Sleep(1000);
+            server.Close();            
 
             Thread.Sleep(60000);
         }

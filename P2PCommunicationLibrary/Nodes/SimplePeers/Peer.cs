@@ -68,7 +68,7 @@ namespace P2PCommunicationLibrary.SimplePeers
 
                 //Read confirmation message
                 _superPeerClient.Read();
-               // RunSendPingMessageTask();
+                RunSendPingMessageTask();
             }
             catch (SocketException se)
             {
@@ -119,8 +119,7 @@ namespace P2PCommunicationLibrary.SimplePeers
         }
 
         private void SendPingMessageToSuperPeer()
-        {
-            Console.WriteLine("send...");
+        {            
             _superPeerClient.Send(new RequestMessage(MessageType.Ping));
         }
 
@@ -130,12 +129,13 @@ namespace P2PCommunicationLibrary.SimplePeers
                 return;
 
             IsRunning = false;
-
+               
             var closeConnectionMessage = new RequestMessage(MessageType.CloseConnection);
-            _superPeerClient.Send(closeConnectionMessage);
+            _superPeerClient.Send(closeConnectionMessage);            
 
             try
             {
+                Thread.Sleep(5000);
                 _superPeerClient.Close();
             }
             catch (SocketException)
@@ -178,6 +178,16 @@ namespace P2PCommunicationLibrary.SimplePeers
         public void StopListenMessagesFromSuperPeer()
         {
             _superPeerClient.ListenMessages();
+        }
+
+        public void Send(IClient client, byte[] byteArray)
+        {
+            client.Send(new ByteArrayMessage(byteArray, 0, byteArray.Length));
+        }
+
+        public byte[] Read(IClient client)
+        {
+            return ((ByteArrayMessage)client.Read()).ByteArray;
         }
     }
 }

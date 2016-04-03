@@ -15,6 +15,7 @@
 
         TextMessage = 101,
         IntegerMessage = 102,
+        BinaryArrayMessage = 103,
 
         PeerAddress = 111,     
         ClientPeerAddress = 112,

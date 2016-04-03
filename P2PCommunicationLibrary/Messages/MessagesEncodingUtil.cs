@@ -27,6 +27,11 @@ namespace P2PCommunicationLibrary.Messages
             return binaryReader.ReadByte();
         }
 
+        public static byte[] ReadByteArray(BinaryReader binaryReader, int length)
+        {
+            return binaryReader.ReadBytes(length);
+        }
+
         public static int ReadInt(BinaryReader binaryReader)
         {
             return IPAddress.NetworkToHostOrder(binaryReader.ReadInt32());
@@ -56,6 +61,11 @@ namespace P2PCommunicationLibrary.Messages
         }
 
         public static void WriteByte(BinaryWriter binaryWriter, byte value)
+        {
+            binaryWriter.Write(value);
+        }
+
+        public static void WriteByteArray(BinaryWriter binaryWriter, byte[] value)
         {
             binaryWriter.Write(value);
         }

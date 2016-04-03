@@ -14,7 +14,7 @@ namespace P2PCommunicationLibrary.SimplePeers.ClientPeer
             ClientPeerAddress = clientPeerAddress;
         }
 
-        public abstract void ProcessConnection();
+        public abstract IClient GetConnection();
 
         public virtual void Close()
         {

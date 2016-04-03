@@ -15,7 +15,7 @@ namespace P2PCommunicationLibrary.SimplePeers.ServerPeer
          
         }
 
-        public abstract void ProcessConnection();        
+        public abstract IClient GetConnection();        
 
         protected static void AddMethodToNewClientEvent(IServer server, ClientConnectedEventHandler clientConnectedEventHandler)
         {

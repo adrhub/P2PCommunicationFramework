@@ -18,16 +18,16 @@ namespace P2PCommunicationLibrary.SuperPeer
 
             switch (message.TypeOfMessage)
             {
-                case MessageType.ConnectAsServer:                   
-                    InitConnectionAsServer(((PeerAddressMessage) messageArgs.Message).PeerAddress);      
-                    _superPeerServer.GetClientInfo().Client.StopListeningMessages();         
+                case MessageType.ConnectAsServer:
+                    _superPeerServer.GetClientInfo().Client.StopListeningMessages();
+                    InitConnectionAsServer(((PeerAddressMessage) messageArgs.Message).PeerAddress);                                   
                     break;
             }
         }
 
         private void InitConnectionAsServer(PeerAddress peerAddress)
         {            
-            _superPeerServer.AddAddressToAllowedConnections(peerAddress);
+            _superPeerServer.AllowedConnection = peerAddress;
         }
     }
 }

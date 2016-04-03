@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
+using P2PCommunicationLibrary.Messages;
 using P2PCommunicationLibrary.Net;
 
 namespace P2PCommunicationLibrary.SuperPeer
@@ -59,14 +60,13 @@ namespace P2PCommunicationLibrary.SuperPeer
         }
 
         public static void ClientOnConnectionClosedEvent(IClient client, EventArgs enentArgs)
-        {
+        {            
             CleanRepositories(client);
         }
 
         public static void CleanRepositories(IClient client)
-        {
-            Console.WriteLine("clear...");
-            DisplayRepositoryState();
+        {            
+            //DisplayRepositoryState();
 
             CleanClientRepository(client);
             CleanConnectionRepository(client);
@@ -80,7 +80,7 @@ namespace P2PCommunicationLibrary.SuperPeer
             CleanServerFromConnectionsRepository(closedClient);
             CleanConnectionsFromConnectionsRepository(closedClient);
         }
-
+        
         private static void CleanConnectionsFromConnectionsRepository(IClient closedClient)
         {
             List<ConnectionPair> connectionPairList = ConnectionsRepository.GetConnections();

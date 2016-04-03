@@ -13,5 +13,6 @@ namespace P2PCommunicationLibrary.Net
         void Listen();
         void StopListening();
         void Bind();
+        IClient AcceptClient();
     }
 }

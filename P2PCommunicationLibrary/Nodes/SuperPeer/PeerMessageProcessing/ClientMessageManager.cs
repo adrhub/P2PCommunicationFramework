@@ -21,7 +21,7 @@ namespace P2PCommunicationLibrary.SuperPeer
             switch (message.TypeOfMessage)
             {
                 case MessageType.ConnectAsClient:
-                    InitConnectionAsClient(((PeerAddressMessage)messageArgs.Message).PeerAddress);
+                    InitConnectionAsClient(((PeerAddressMessage)messageArgs.Message).PeerAddress);                    
                     break;
             }
         }
@@ -40,7 +40,7 @@ namespace P2PCommunicationLibrary.SuperPeer
             if (targetServer == null)
                 return;
 
-            if (!targetServer.GetAllowedConnections().Contains(_superPeerClient.GetClientInfo().PeerAddress()))
+            if (!targetServer.AllowedConnection.Equals(_superPeerClient.GetClientInfo().PeerAddress()))
                 return;
 
             ConnectionPair connectionPair = CreateConnectionPair(targetServer, _superPeerClient);                        
@@ -61,9 +61,9 @@ namespace P2PCommunicationLibrary.SuperPeer
         }
 
         private void ProcessConnectionBetweenClients(ConnectionPair connectionPair)
-        {
-            Console.WriteLine("Hello from process connection");
-            connectionPair.ProcessConnection();           
+        {            
+            connectionPair.ProcessConnection();
+            connectionPair.Server.GetClientInfo().Client.ListenMessages();
         }
     }
 }

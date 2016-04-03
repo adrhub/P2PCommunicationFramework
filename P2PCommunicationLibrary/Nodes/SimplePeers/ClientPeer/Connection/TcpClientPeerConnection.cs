@@ -12,13 +12,15 @@ namespace P2PCommunicationLibrary.SimplePeers.ClientPeer
         {            
         }
 
-        public override void ProcessConnection()
+        public override IClient GetConnection()
         {
             PeerAddressMessage peerAddressMessage = (PeerAddressMessage) ClientPeer.Peer.ReadFromSuperPeer();
 
             MessageManager messageManager = ClientPeer.Peer.MessageManager;
             IPEndPoint connectionIpEndPoint = peerAddressMessage.PeerAddress.PrivateEndPoint;
-            Client = new ClientTcp(connectionIpEndPoint, messageManager);            
+            Client = new ClientTcp(connectionIpEndPoint, messageManager);
+            
+            return Client;            
         }        
     }
 }

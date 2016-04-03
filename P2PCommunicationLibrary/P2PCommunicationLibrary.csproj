@@ -47,6 +47,7 @@
     <Compile Include="Messages\MessageFactory\IDecodingFactory.cs" />
     <Compile Include="Messages\MessageFactory\IEncodingFactory.cs" />
     <Compile Include="Messages\MessageHierarchy\BinaryMessageBase.cs" />
+    <Compile Include="Messages\MessageHierarchy\ByteArrayMessage.cs" />
     <Compile Include="Messages\MessageHierarchy\ConfirmationMessage.cs" />
     <Compile Include="Messages\MessageHierarchy\ConnectionMessage.cs" />
     <Compile Include="Messages\MessageHierarchy\IntegerMessage.cs" />

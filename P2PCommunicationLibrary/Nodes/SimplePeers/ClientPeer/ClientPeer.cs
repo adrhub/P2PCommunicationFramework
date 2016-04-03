@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Net.Mail;
 using P2PCommunicationLibrary.Messages;
 using P2PCommunicationLibrary.Net;
 
@@ -6,6 +7,7 @@ namespace P2PCommunicationLibrary.SimplePeers.ClientPeer
 {
     public class ClientPeer
     {
+        private IClient _server;
         internal Peer Peer { get; private set; }
 
         public IEncryptor Encryptor
@@ -27,12 +29,7 @@ namespace P2PCommunicationLibrary.SimplePeers.ClientPeer
         public void Run()
         {
             Peer.Run(ClientType.Client);
-        }
-
-        public void Close()
-        {
-            Peer.Close();
-        }
+        }        
 
         public PeerAddress GetPeerAddress()
         {
@@ -44,19 +41,39 @@ namespace P2PCommunicationLibrary.SimplePeers.ClientPeer
             var connectAsServerMessage = new PeerAddressMessage(peerAddress, MessageType.ConnectAsClient);
             Peer.SendToSuperPeer(connectAsServerMessage);
 
-            var connectionAllowed = (RequestMessage) Peer.ReadFromSuperPeer();
-            ProcessConnectionToServerPeer(connectionAllowed);
+            Peer.ReadFromSuperPeer();            
+            var connection = new TcpClientPeerConnection(this, Peer.PeerAddress);
+            _server = connection.GetConnection();
+            Peer.Close();
         }
 
-        private void ProcessConnectionToServerPeer(RequestMessage requestMessage)
+//        private void ProcessConnectionToServerPeer(RequestMessage requestMessage)
+//        {        
+//            switch (requestMessage.RequestedMessageType)
+//            {
+//                case MessageType.TcpConnection:
+//                    var connection = new TcpClientPeerConnection(this, Peer.PeerAddress);
+//                    _server = connection.GetConnection();
+//                    break;
+//            }
+//        }
+
+        public void Send(byte[] byteArray)
         {
-            switch (requestMessage.RequestedMessageType)
-            {
-                case MessageType.TcpConnection:
-                    var connection = new TcpClientPeerConnection(this, Peer.PeerAddress);
-                    connection.ProcessConnection();
-                    break;
-            }
+            Peer.Send(_server, byteArray);
+        }
+
+        public byte[] Read()
+        {
+            return Peer.Read(_server);
+        }
+
+        public void Close()
+        {
+            if (_server != null)
+                _server.Close();
+
+            Peer.Close();
         }
     }
 }

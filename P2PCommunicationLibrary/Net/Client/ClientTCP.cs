@@ -40,8 +40,7 @@ namespace P2PCommunicationLibrary.Net
         }
 
         public override void Send(BinaryMessageBase message)
-        {
-            Console.WriteLine(Thread.CurrentThread.ManagedThreadId);
+        {            
             lock (SendMonitor)
             {
                 try
@@ -65,8 +64,7 @@ namespace P2PCommunicationLibrary.Net
         }
 
         public override BinaryMessageBase Read()
-        {
-            Console.WriteLine(Thread.CurrentThread.ManagedThreadId);
+        {            
             byte[] buffer = new byte[EncodingConstants.MAX_MESSAGE_LENGTH];
             BinaryMessageBase receivedMessage = null;
 

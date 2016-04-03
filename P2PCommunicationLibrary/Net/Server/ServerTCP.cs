@@ -98,6 +98,29 @@ namespace P2PCommunicationLibrary.Net
             }
         }
 
+        public IClient AcceptClient()
+        {
+            try
+            {
+                lock (_syncRoot)
+                {
+                    if (!_binded)
+                        Bind();
+
+                    _listener.Listen(_backlog);
+
+                    Socket newClient = _listener.Accept();
+                    return new ClientTcp(newClient, _messageManager);
+                }
+            }
+            catch (SocketException se)
+            {
+                Trace.WriteLine("SocketException: " + se.ErrorCode + " " + se.Message);
+            }
+
+            return null;
+        }
+
         public void StopListening()
         {
             if (IsListening)
@@ -133,7 +156,7 @@ namespace P2PCommunicationLibrary.Net
                 {
                     Trace.WriteLine("SocketException: " + se.ErrorCode + " " + se.Message);
                 }
-            }
+            }         
         }    
     }
 }

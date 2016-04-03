@@ -16,35 +16,27 @@ namespace P2PCommunicationLibrary.SimplePeers.ServerPeer
         {           
         }
 
-        public override void ProcessConnection()
+        public override IClient GetConnection()
         {                       
-            RunConnectionTcpServer();
+            SetupListener();
             ServerPeer.Peer.SendToSuperPeer(
                 new PeerAddressMessage(
                 new PeerAddress(
                     new IPEndPoint(ServerPeer.Peer.PeerAddress.PrivateEndPoint.Address, _server.Port),
                     null)));
+
+            Client = _server.AcceptClient();
+            _server.Close();
+
+            return Client;
         }
 
-        private void RunConnectionTcpServer()
+        private void SetupListener()
         {                    
             IPAddress address = ServerPeer.Peer.PeerAddress.PrivateEndPoint.Address;
             MessageManager messageManager = ServerPeer.Peer.MessageManager;
-            _server = new ServerTcp(address, 0, messageManager);
-            _server.NewClientEvent += ServerOnNewClientEvent;
-            _server.Bind();
-        
-            Task.Factory.StartNew(() =>
-            {
-                _server.Listen();
-            });
-        }
-        
-        private void ServerOnNewClientEvent(IServer sender, IClient newClient)
-        {
-            //TODO check if it's the expected client           
-            Client = newClient;
-            RemoveMethodFromNewClientEvent(_server, ServerOnNewClientEvent);                                         
-        }        
+            _server = new ServerTcp(address, 0, messageManager);            
+            _server.Bind();                                                       
+        }               
     }
 }

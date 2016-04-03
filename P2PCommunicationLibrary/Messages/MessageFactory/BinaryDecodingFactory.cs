@@ -26,6 +26,8 @@
                     return new IntegerMessage(encoding);
                 case MessageType.ConnectionPort:
                     return new IntegerMessage(encoding);
+                case MessageType.BinaryArrayMessage:
+                    return new ByteArrayMessage(encoding);
                 default:
                     return null;
             }
